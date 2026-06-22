@@ -1,11 +1,265 @@
 ---
-import Welcome from '../components/Welcome.astro';
+import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
+import PostCard from '../components/PostCard.astro';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+// Fetch all blog posts
+const allPosts = await getCollection('blog');
+
+// Sort by date (newest first)
+const sortedPosts = allPosts.sort(
+  (a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()
+);
+
+// Find featured post, fallback to first post
+const featuredPost = sortedPosts.find((post) => post.data.featured) || sortedPosts[0];
+
+// Get recent posts (exclude featured, limit to 10)
+const recentPosts = sortedPosts.filter((post) => post.id !== featuredPost.id).slice(0, 10);
+
+// Helper to get slug from post ID
+const getSlug = (post: any) => post.id.split('/').pop()?.replace(/\.md$/, '') || '';
 ---
 
-<Layout>
-	<Welcome />
+<Layout title="human readable">
+  <div class="container">
+    <!-- Hero Section -->
+    <section class="hero">
+      <h1 class="hero-title">human readable</h1>
+      <p class="hero-subtitle">
+        a retro-arcade blog about code, systems, and the stuff in between
+      </p>
+      <div class="hero-divider"></div>
+    </section>
+
+    <!-- Featured Post -->
+    {featuredPost && (
+      <section class="featured-section">
+        <p class="section-label">featured post</p>
+        <article class="post-card featured">
+          <div class="card-content">
+            <h3 class="card-title">
+              <a href={`/blog/${getSlug(featuredPost)}`}>{featuredPost.data.title}</a>
+            </h3>
+            <p class="card-description">{featuredPost.data.description}</p>
+            <div class="card-footer">
+              <span class="card-date">
+                {new Date(featuredPost.data.pubDate).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric',
+                })}
+              </span>
+              {featuredPost.data.tags && featuredPost.data.tags.length > 0 && (
+                <div class="card-tags">
+                  {featuredPost.data.tags.map((tag: string) => (
+                    <span class="card-tag">#{tag}</span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </article>
+      </section>
+    )}
+
+    <!-- Recent Posts -->
+    {recentPosts.length > 0 && (
+      <section class="posts-section" id="posts">
+        <p class="section-label">recent posts</p>
+        <div class="posts-list">
+          {recentPosts.map((post) => (
+            <article class="post-card">
+              <div class="card-content">
+                <h3 class="card-title">
+                  <a href={`/blog/${getSlug(post)}`}>{post.data.title}</a>
+                </h3>
+                <p class="card-description">{post.data.description}</p>
+                <div class="card-footer">
+                  <span class="card-date">
+                    {new Date(post.data.pubDate).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                    })}
+                  </span>
+                  {post.data.tags && post.data.tags.length > 0 && (
+                    <div class="card-tags">
+                      {post.data.tags.map((tag: string) => (
+                        <span class="card-tag">#{tag}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <!-- Empty State -->
+    {sortedPosts.length === 0 && (
+      <section class="empty-state">
+        <p class="text-dim">no posts yet. check back soon.</p>
+      </section>
+    )}
+  </div>
 </Layout>
+
+<style>
+  .hero {
+    text-align: center;
+    margin-bottom: 4rem;
+    padding-top: 2rem;
+  }
+
+  .hero-title {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+    letter-spacing: 3px;
+    text-transform: lowercase;
+  }
+
+  .hero-subtitle {
+    font-size: 1.2rem;
+    color: var(--color-text-dim);
+    margin-bottom: 2rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero-divider {
+    height: 2px;
+    max-width: 200px;
+    margin: 2rem auto;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--color-primary),
+      transparent
+    );
+  }
+
+  .section-label {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--color-text-dim);
+    margin-bottom: 1.5rem;
+    border-bottom: 1px dotted var(--color-surface-light);
+    padding-bottom: 0.75rem;
+  }
+
+  .featured-section {
+    margin-bottom: 4rem;
+  }
+
+  .posts-section {
+    margin-bottom: 2rem;
+  }
+
+  .posts-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem 0;
+  }
+
+  .post-card {
+    padding: 1.5rem;
+    border: 1px solid var(--color-surface-light);
+    border-radius: 2px;
+    background-color: var(--color-surface);
+    transition: all 0.25s ease;
+    margin-bottom: 1.5rem;
+  }
+
+  .post-card:hover {
+    border-color: var(--color-primary);
+    box-shadow: var(--glow-primary);
+  }
+
+  .post-card.featured {
+    border: 2px solid var(--color-accent);
+    background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-surface-light) 100%);
+    padding: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .post-card.featured .card-title {
+    color: var(--color-accent);
+    text-shadow: var(--glow-accent);
+  }
+
+  .card-title {
+    margin-bottom: 0.75rem;
+    margin-top: 0;
+  }
+
+  .card-title a {
+    color: var(--color-primary);
+    border: none;
+    transition: color 0.2s ease;
+  }
+
+  .card-title a:hover {
+    color: var(--color-accent);
+  }
+
+  .featured .card-title a {
+    color: var(--color-accent);
+  }
+
+  .card-description {
+    color: var(--color-text-dim);
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+  }
+
+  .card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.85rem;
+  }
+
+  .card-date {
+    color: var(--color-text-dim);
+  }
+
+  .card-tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .card-tag {
+    color: var(--color-accent-warm);
+    background-color: rgba(122, 162, 247, 0.1);
+    padding: 0.2rem 0.6rem;
+    border-radius: 2px;
+    border: 1px solid var(--color-accent-warm);
+  }
+
+  @media (max-width: 640px) {
+    .post-card {
+      padding: 1rem;
+    }
+
+    .post-card.featured {
+      padding: 1.5rem;
+    }
+
+    .card-footer {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>

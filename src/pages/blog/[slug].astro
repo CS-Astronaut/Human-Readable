@@ -1,0 +1,31 @@
+---
+import { getCollection, getEntry, render } from 'astro:content';
+import BlogPost from '../../layouts/BlogPost.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+
+  return posts.map((post) => {
+    const slug = post.id.split('/').pop()?.replace(/\.md$/, '') || '';
+
+    return {
+      params: { slug },
+      props: { postId: post.id },
+    };
+  });
+}
+
+const { postId } = Astro.props;
+
+const post = await getEntry('blog', postId);
+
+if (!post) {
+  return Astro.redirect('/404');
+}
+
+const { Content } = await render(post);
+---
+
+<BlogPost frontmatter={post.data}>
+  <Content />
+</BlogPost>

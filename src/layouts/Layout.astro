@@ -1,23 +1,118 @@
+---
+import '../styles/theme.css';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+---
+
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
-	</head>
-	<body>
-		<slot />
-	</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description || 'A retro-arcade blog'} />
+    <title>{title} • human readable</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <nav class="site-nav">
+          <a href="/" class="site-title">
+            <span class="bracket">[</span>
+            human readable
+            <span class="bracket">]</span>
+          </a>
+          <ul class="nav-links">
+            <li><a href="/">home</a></li>
+            <li><a href="/#posts">posts</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p class="text-dim">
+          ~ human readable ~ made with <span class="accent">♠</span> ~
+        </p>
+      </div>
+    </footer>
+  </body>
 </html>
 
 <style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
+  .site-header {
+    border-bottom: 2px solid var(--color-surface-light);
+    padding: 2rem 0;
+    margin-bottom: 3rem;
+  }
+
+  .site-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .site-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--color-primary-bright);
+    border: none;
+    text-shadow: var(--glow-bright);
+    text-transform: lowercase;
+    letter-spacing: 2px;
+  }
+
+  .bracket {
+    color: var(--color-accent);
+    margin: 0 0.5rem;
+  }
+
+  .nav-links {
+    display: flex;
+    list-style: none;
+    gap: 2rem;
+    margin: 0;
+  }
+
+  .nav-links a {
+    font-size: 0.95rem;
+    text-transform: lowercase;
+    letter-spacing: 0.5px;
+  }
+
+  .site-footer {
+    border-top: 2px solid var(--color-surface-light);
+    padding: 2rem 0;
+    margin-top: 4rem;
+    text-align: center;
+  }
+
+  main {
+    min-height: calc(100vh - 300px);
+  }
+
+  @media (max-width: 640px) {
+    .site-nav {
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .nav-links {
+      gap: 1rem;
+    }
+
+    .site-title {
+      font-size: 1.4rem;
+    }
+  }
 </style>
