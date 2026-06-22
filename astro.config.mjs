@@ -2,5 +2,7 @@ import { defineConfig } from 'astro/config';
 
 export default defineConfig({
   output: 'static',
-  integrations: [],
+  site: 'https://CS-Astronaut.github.io',
+  base: '/Human-Readable/',
 });
+
