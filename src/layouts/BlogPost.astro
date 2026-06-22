@@ -14,6 +14,8 @@ interface Props {
   };
 }
 const { frontmatter } = Astro.props;
+const isRTL = frontmatter.lang === "fa";
+
 
 const ogImage = frontmatter.cover
   ? new URL(frontmatter.cover.src, Astro.site).href
@@ -27,7 +29,7 @@ const pubDate = new Date(frontmatter.pubDate).toLocaleDateString('en-US', {
 });
 ---
 
-<Layout title={frontmatter.title} description={frontmatter.description} ogImage={ogImage}>
+<Layout title={frontmatter.title} description={frontmatter.description} ogImage={ogImage}  lang={frontmatter.lang ?? "en"} dir={isRTL ? "rtl" : "ltr"}>
   <article class="post">
     <div class="container">
       <header class="post-header">

@@ -36,6 +36,15 @@ body {
   letter-spacing: 0.3px;
 }
 
+html[dir="rtl"] {
+  font-family: "Vazirmatn", system-ui, sans-serif;
+  direction: rtl;
+}
+
+html[dir="ltr"] {
+  font-family: system-ui, sans-serif;
+}
+
 /* Typography */
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Courier New', monospace;
@@ -143,4 +152,9 @@ li {
 
 .success {
   color: var(--color-success);
+
+
+
+
+
 }

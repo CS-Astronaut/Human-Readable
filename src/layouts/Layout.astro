@@ -5,13 +5,16 @@ interface Props {
   title: string;
   description?: string;
   ogImage?: string;
+  lang?: string;
+  dir?: "ltr" | "rtl";
 }
 
-const { title, description, ogImage } = Astro.props;
+const { title, description, ogImage, lang = "en", dir = "ltr" } = Astro.props;
 ---
 
+
 <!doctype html>
-<html lang="en">
+<html lang={lang} dir={dir}>
   <head>
     
     <meta charset="UTF-8" />
@@ -26,6 +29,17 @@ const { title, description, ogImage } = Astro.props;
 
     <!-- Canonical -->
     <link rel="canonical" href={Astro.url.href} />
+
+
+    <!-- fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+
 
     <!-- Open Graph -->
     <meta property="og:title" content={`${title} • human readable`} />

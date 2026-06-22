@@ -13,6 +13,9 @@ const blog = defineCollection({
 
       // NEW OG
       cover: image().optional(),
+      
+      // Persian support !
+      lang: z.enum(['en', 'fa']).optional().default('en'),
     }),
 });
 
