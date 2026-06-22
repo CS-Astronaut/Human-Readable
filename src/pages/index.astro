@@ -39,7 +39,7 @@ const getSlug = (post: any) => post.id.split('/').pop()?.replace(/\.md$/, '') ||
         <article class="post-card featured">
           <div class="card-content">
             <h3 class="card-title">
-              <a href={`/blog/${getSlug(featuredPost)}`}>{featuredPost.data.title}</a>
+              <a href={`${import.meta.env.BASE_URL}blog/${getSlug(featuredPost)}`}>{featuredPost.data.title}</a>
             </h3>
             <p class="card-description">{featuredPost.data.description}</p>
             <div class="card-footer">
@@ -72,7 +72,9 @@ const getSlug = (post: any) => post.id.split('/').pop()?.replace(/\.md$/, '') ||
             <article class="post-card">
               <div class="card-content">
                 <h3 class="card-title">
-                  <a href={`/blog/${getSlug(post)}`}>{post.data.title}</a>
+                  <a href={`${import.meta.env.BASE_URL}blog/${getSlug(post)}`}>
+                    {post.data.title}
+                  </a>
                 </h3>
                 <p class="card-description">{post.data.description}</p>
                 <div class="card-footer">

@@ -17,9 +17,9 @@ Static sites are fast, secure, and easy to deploy. Astro makes it simple to buil
 Store images in `public/blog/getting-started/` and reference them in markdown like this:
 
 ```markdown
-![Alt text](/blog/folder-of-post/pixel.png)
+![Alt text](./pixel.png)
 ```
-![Alt text](/blog/getting-started/pixel.png)
+![Alt text](./pixel.png)
 
 
 For organized posts with multiple images:
@@ -59,7 +59,7 @@ tags: ["tag1", "tag2"]
 ## The Setup
 
 - **Posts**: Go in `src/content/blog/` as `.md` files
-- **Images**: Go in `public/blog/post-folder/` with organized subfolders
+- **Images**: Go in the post's directory and paste the image 
 - **Homepage**: Shows featured post + recent list
 - **Theme**: Tokyo Night retro-arcade with Courier New monospace
 - **Output**: Fully static HTML, ready to deploy

@@ -20,7 +20,7 @@ const pubDateFormatted = new Date(pubDate).toLocaleDateString('en-US', {
 <article class={`post-card ${featured ? 'featured' : ''}`}>
   <div class="card-content">
     <h3 class="card-title">
-      <a href={`/blog/${slug}`}>{title}</a>
+      <a href={`{import.meta.env.BASE_URL}blog/${slug}`}>{title}</a>
     </h3>
     <p class="card-description">{description}</p>
     <div class="card-footer">

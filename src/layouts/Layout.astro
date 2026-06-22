@@ -22,14 +22,14 @@ const { title, description } = Astro.props;
     <header class="site-header">
       <div class="container">
         <nav class="site-nav">
-          <a href="/" class="site-title">
+          <a href={import.meta.env.BASE_URL} class="site-title">
             <span class="bracket">[</span>
             human readable
             <span class="bracket">]</span>
           </a>
           <ul class="nav-links">
-            <li><a href="/">home</a></li>
-            <li><a href="/#posts">posts</a></li>
+            <li><a href={import.meta.env.BASE_URL}>home</a></li>
+            <li><a href={`${import.meta.env.BASE_URL}#posts`}>posts</a></li>
           </ul>
         </nav>
       </div>

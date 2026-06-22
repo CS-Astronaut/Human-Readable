@@ -43,7 +43,7 @@ const pubDate = new Date(frontmatter.pubDate).toLocaleDateString('en-US', {
       <footer class="post-footer">
         <hr />
         <nav class="post-nav">
-          <a href="/" class="back-link">← back to posts</a>
+          <a href={import.meta.env.BASE_URL} class="back-link">← back to posts</a>
         </nav>
       </footer>
     </div>
