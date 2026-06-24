@@ -1,6 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
-
+import { Image } from 'astro:assets'; //astro image opt
 // Dynamically import all images from the slideshow directory
 const images = import.meta.glob<{ default: ImageMetadata }>(
   '../assets/slideshow/*.{jpg,jpeg,png,webp}',
@@ -19,7 +19,18 @@ const backgroundImageUrl = randomImage?.src || '';
 
 <Layout title="About — human readable">
   <!-- Random Background Image -->
-  <div class="bg-image" style={`background-image: url('${backgroundImageUrl}');`}></div>
+  <!-- <div class="bg-image" style={`background-image: url('${backgroundImageUrl}');`}   loading="eager"></div> -->
+
+  <Image
+    src={randomImage}
+    alt=""
+    loading="eager"
+    fetchpriority="high"
+    class="bg-image"
+  />
+
+  <div class="bg-overlay"></div>
+
 
   <div class="container">
     <!-- Hero Section -->
@@ -107,26 +118,51 @@ const backgroundImageUrl = randomImage?.src || '';
 </Layout>
 
 <style>
-  .bg-image {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    filter: blur(8px) brightness(0.6);
-  }
 
-/* .bg-image::after { */
-/*   content: ''; */
-/*   position: absolute; */
-/*   inset: 0; */
-/*   background: radial-gradient(circle, rgba(26, 27, 38, 0.3), rgba(26, 27, 38, 0.7)); */
-/*   pointer-events: none; */
-/* } */
+
+
+  .bg-image {
+  position: fixed;
+  inset: 0;
+  top: 80px;      /* header height */
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+
+  z-index: -2;
+
+  /* make it feel like a background */
+  filter:
+    /* blur(10px) */
+    brightness(0.45)
+    saturate(0.7);
+
+  transform: scale(1.08);
+}
+
+.bg-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(26, 27, 38, 0.15) 0%,
+      rgba(26, 27, 38, 0.45) 50%,
+      rgba(26, 27, 38, 0.85) 100%
+    );
+}
+
+
+
+@media (max-width: 768px) {
+  .bg-image {
+    object-position: center top;
+    transform: scale(1.1);
+  }
+}
 
 
   .container {
@@ -309,8 +345,5 @@ const backgroundImageUrl = randomImage?.src || '';
       font-size: 1.1rem;
     }
 
-    .bg-image {
-      filter: blur(30px) brightness(0.6);
-    }
   }
 </style>
