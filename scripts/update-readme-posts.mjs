@@ -27,10 +27,6 @@ function getPosts() {
     .sort((a, b) => a.localeCompare(b));
 }
 
-function escapeRegex(s) {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
 const readme = fs.readFileSync(readmePath, "utf8");
 const posts = getPosts();
 
@@ -49,10 +45,16 @@ const section = readme.slice(postsHeadingIndex, sectionEndIndex).trim();
 const nextHeading = nextHeadingMatch ? nextHeadingMatch[1] : "";
 
 const existingRows = [...section.matchAll(/^\|\s*\d+\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|$/gm)]
-  .map((m) => ({
-    name: m[1].trim(),
-    date: m[2].trim()
-  }));
+  .map((m) => {
+    const postCell = m[1].trim();
+    // Extract folder name from markdown link [name](url) or plain text
+    const linkMatch = postCell.match(/\[([^\]]+)\]/);
+    const name = linkMatch ? linkMatch[1] : postCell;
+    return {
+      name,
+      date: m[2].trim()
+    };
+  });
 
 const existingNames = existingRows.map(r => r.name);
 const newPosts = posts.filter((p) => !existingNames.includes(p));
@@ -93,10 +95,13 @@ if (tableLines.length === 0) {
 const dataLines = tableLines.filter((line) => /^\|\s*\d+\s*\|/.test(line));
 const nextRowNum = dataLines.length + 1;
 
+const baseUrl = "https://cs-astronaut.github.io/Human-Readable/blog";
+
 // Add new posts in sorted order
 for (let i = 0; i < newPostsWithDates.length; i++) {
   const { name, date } = newPostsWithDates[i];
-  dataLines.push(`| ${nextRowNum + i} | ${name} | ${date} |`);
+  const postLink = `[${name}](${baseUrl}/${name}/)`;
+  dataLines.push(`| ${nextRowNum + i} | ${postLink} | ${date} |`);
 }
 
 const updatedTable = [
