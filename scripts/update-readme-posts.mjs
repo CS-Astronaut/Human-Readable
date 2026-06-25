@@ -19,6 +19,24 @@ function getCommitDate(relPath) {
   }
 }
 
+function getCommitAuthor(relPath) {
+  try {
+    // Get author name and email
+    const out = execFileSync(
+      "git",
+      ["log", "-1", "--format=%an|%ae", "--", relPath],
+      { encoding: "utf8" }
+    ).trim();
+    
+    if (!out) return { name: "unknown", email: "unknown" };
+    
+    const [name, email] = out.split("|");
+    return { name: name || "unknown", email: email || "unknown" };
+  } catch {
+    return { name: "unknown", email: "unknown" };
+  }
+}
+
 function getPosts() {
   return fs
     .readdirSync(blogRoot, { withFileTypes: true })
@@ -64,12 +82,13 @@ if (newPosts.length === 0) {
   process.exit(0);
 }
 
-// Fetch commit dates for new posts and sort by date (oldest first, newest last)
+// Fetch commit dates and authors for new posts and sort by date (oldest first, newest last)
 const newPostsWithDates = newPosts
   .map((post) => {
     const relPath = path.posix.join("src/content/blog", post);
     const date = getCommitDate(relPath);
-    return { name: post, date };
+    const author = getCommitAuthor(relPath);
+    return { name: post, date, author };
   })
   .sort((a, b) => {
     // If either date is "unknown", sort by name
@@ -87,8 +106,8 @@ let tableLines = section
 // If there is no table yet, create one
 if (tableLines.length === 0) {
   tableLines = [
-    "| Row | Post name | Commit date |",
-    "| --- | --- | --- |",
+    "| Row | Post name | Commit date | Contributor |",
+    "| --- | --- | --- | --- |",
   ];
 }
 
@@ -99,9 +118,16 @@ const baseUrl = "https://cs-astronaut.github.io/Human-Readable/blog";
 
 // Add new posts in sorted order
 for (let i = 0; i < newPostsWithDates.length; i++) {
-  const { name, date } = newPostsWithDates[i];
+  const { name, date, author } = newPostsWithDates[i];
   const postLink = `[${name}](${baseUrl}/${name}/)`;
-  dataLines.push(`| ${nextRowNum + i} | ${postLink} | ${date} |`);
+  
+  // Create GitHub link from author name (assumes author name matches GitHub username)
+  const githubUsername = author.name.toLowerCase().replace(/\s+/g, "-");
+  const contributorLink = author.name !== "unknown"
+    ? `[@${author.name}](https://github.com/${githubUsername})`
+    : "unknown";
+  
+  dataLines.push(`| ${nextRowNum + i} | ${postLink} | ${date} | ${contributorLink} |`);
 }
 
 const updatedTable = [
@@ -116,6 +142,6 @@ const updatedReadme = readme.slice(0, postsHeadingIndex) + updatedTable + "\n" +
 fs.writeFileSync(readmePath, updatedReadme);
 
 console.log(`Added ${newPostsWithDates.length} new post(s) to README.md (sorted by commit date)`);
-newPostsWithDates.forEach(({ name, date }) => {
-  console.log(`  - ${name} (${date})`);
+newPostsWithDates.forEach(({ name, date, author }) => {
+  console.log(`  - ${name} (${date}) by ${author.name}`);
 });
