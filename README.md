@@ -7,7 +7,7 @@ A minimal, retro-arcade themed blog for computer science, AI and technology post
 
 | Row | Post name | Commit date | Contributor |
 | --- | --- | --- | --- |
-| 1 | [getting-started](https://cs-astronaut.github.io/Human-Readable/blog/getting-started/) | 2026-06-25 | [@CS-Astronaut](https://github.com/CS-Astronaut) |
+| 1 | [getting-started](https://cs-astronaut.github.io/Human-Readable/blog/welcome/) | 2026-06-25 | [@CS-Astronaut](https://github.com/CS-Astronaut) |
 
 ##      Tech Stack
 
