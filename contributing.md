@@ -12,7 +12,7 @@ make a directory under `/src/content/blog/` with a name related to your post , a
 
 ## make your post
 
-make a `your-post.md` file in your directory.
+make a `your-post.md` file in your directory & make sure that the `post-name` and the `directory-name` are exactly the same.
 
 first you should paste and fill in a heading like this in your markdown post:
 ```yaml
@@ -57,7 +57,7 @@ src
 │       │   └── pixel.png
 │       ├── PCA-in-face-recognition
 │       │   ├── hero.png
-│       │   └── PCA in Face Recognition.md
+│       │   └── PCA-in-face-recognition.md
 
 ```
 
