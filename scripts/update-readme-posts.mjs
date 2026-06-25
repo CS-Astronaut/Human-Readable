@@ -28,12 +28,26 @@ function getCommitAuthor(relPath) {
       { encoding: "utf8" }
     ).trim();
     
-    if (!out) return { name: "unknown", email: "unknown" };
+    if (!out) return { name: "unknown", username: "unknown" };
     
     const [name, email] = out.split("|");
-    return { name: name || "unknown", email: email || "unknown" };
+    
+    // Try to extract GitHub username from email (email format: username@users.noreply.github.com)
+    let username = "unknown";
+    if (email && email.includes("@")) {
+      const emailUsername = email.split("@")[0];
+      // Check if it's a GitHub noreply email
+      if (email.includes("users.noreply.github.com")) {
+        username = emailUsername;
+      } else {
+        // Fallback: use part before @ as username
+        username = emailUsername;
+      }
+    }
+    
+    return { name: name || "unknown", username };
   } catch {
-    return { name: "unknown", email: "unknown" };
+    return { name: "unknown", username: "unknown" };
   }
 }
 
@@ -121,10 +135,9 @@ for (let i = 0; i < newPostsWithDates.length; i++) {
   const { name, date, author } = newPostsWithDates[i];
   const postLink = `[${name}](${baseUrl}/${name}/)`;
   
-  // Create GitHub link from author name (assumes author name matches GitHub username)
-  const githubUsername = author.name.toLowerCase().replace(/\s+/g, "-");
-  const contributorLink = author.name !== "unknown"
-    ? `[@${author.name}](https://github.com/${githubUsername})`
+  // Create GitHub link using the extracted username
+  const contributorLink = author.username !== "unknown"
+    ? `[@${author.username}](https://github.com/${author.username})`
     : "unknown";
   
   dataLines.push(`| ${nextRowNum + i} | ${postLink} | ${date} | ${contributorLink} |`);
@@ -143,5 +156,5 @@ fs.writeFileSync(readmePath, updatedReadme);
 
 console.log(`Added ${newPostsWithDates.length} new post(s) to README.md (sorted by commit date)`);
 newPostsWithDates.forEach(({ name, date, author }) => {
-  console.log(`  - ${name} (${date}) by ${author.name}`);
+  console.log(`  - ${name} (${date}) by @${author.username}`);
 });
