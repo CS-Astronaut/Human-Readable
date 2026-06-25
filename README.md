@@ -5,9 +5,6 @@ A minimal, retro-arcade themed blog for computer science, AI and technology post
 ---
 ## Posts
 
-| Row | Post name | Commit date | Contributor |
-| --- | --- | --- | --- |
-| 1 | [getting-started](https://cs-astronaut.github.io/Human-Readable/blog/getting-started/) | 2026-06-25 | [@aminfvrvhvni](https://github.com/aminfvrvhvni) |
 
 ##    Tech Stack
 
