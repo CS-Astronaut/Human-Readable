@@ -1,16 +1,15 @@
 name: Update README Posts
 
-on:
-workflow_dispatch:
+on:  
+  workflow_dispatch:
 
-permissions:
-contents: write
+permissions:  
+  contents: write
 
-jobs:
-update-readme:
-runs-on: ubuntu-latest
+jobs:  
+  update-readme:  
+    runs-on: ubuntu-latest
 
-```
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -27,7 +26,8 @@ steps:
   - name: Verify GitHub auth
     run: gh auth status
 
-  - run: node scripts/update-readme-posts.mjs
+  - name: Update README
+    run: node scripts/update-readme-posts.mjs
 
   - name: Commit README update
     run: |
@@ -42,4 +42,3 @@ steps:
       git add README.md
       git commit -m "docs: update posts list"
       git push
-```
