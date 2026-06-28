@@ -20,13 +20,12 @@ A minimal, retro-arcade themed blog for computer science, AI and technology post
 
 ## Posts
 
-![Last Commit](https://img.shields.io/github/last-commit/CS-Astronaut/human-readable)
-
 | Row | Post name                                                                      | Commit date | Contributor                                      |
 | --- | ------------------------------------------------------------------------------ | ----------- | ------------------------------------------------ |
 | 1   | [getting-started](https://cs-astronaut.github.io/Human-Readable/blog/welcome/) | 2026-06-25  | [@CS-Astronaut](https://github.com/CS-Astronaut) |
+| 2 | [drones-vs-zebra-trucks](https://cs-astronaut.github.io/Human-Readable/blog/drones-vs-zebra-trucks/) | 2026-06-28 | [@CS-Astronaut](https://github.com/CS-Astronaut) |
 
-##      Tech Stack
+##       Tech Stack
 
 - **Framework:** [Astro 6](https://astro.build)
 - **Styling:** CSS with Tokyo Night variables
