@@ -1,7 +1,7 @@
 export const commands = [
 {
     command: "whoami",
-    output: "Amin"
+    output: "amin"
 },
 {
     command: "hostnamectl | grep Pretty",
