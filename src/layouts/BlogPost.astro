@@ -70,6 +70,8 @@ const pubDate = new Date(frontmatter.pubDate).toLocaleDateString('en-US', {
     margin-bottom: 3rem;
     padding-bottom: 2rem;
     border-bottom: 2px solid var(--color-surface-light);
+    direction: ltr;
+    text-align: left;
   }
 
   .post-meta {
@@ -108,7 +110,6 @@ const pubDate = new Date(frontmatter.pubDate).toLocaleDateString('en-US', {
     line-height: 1.8;
   }
 
-
   .post-content :global(img) {
     display: block;
     max-width: 800px;
@@ -118,6 +119,21 @@ const pubDate = new Date(frontmatter.pubDate).toLocaleDateString('en-US', {
     border-radius: 2px;
     margin: 1.5rem auto;
     border: 1px solid var(--color-surface-light);
+  }
+
+  .post-content :global(a) {
+    direction: ltr;
+    unicode-bidi: bidi-override;
+    text-align: left;
+    display: inline-block;
+    max-width: 100%;
+    word-break: break-all;
+  }
+
+  /* If a blockquote contains an LTR link, make the blockquote align nicely */
+  .post-content :global(blockquote) {
+    direction: ltr;
+    text-align: left;
   }
 
   .post-footer {
