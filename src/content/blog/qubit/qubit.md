@@ -1,5 +1,5 @@
 ---
-title: ?What is Qubit
+title: What is Qubit?
 description: Step into the quantum world
 pubDate: 2026-07-04
 featured: false
