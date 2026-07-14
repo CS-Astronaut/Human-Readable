@@ -6,7 +6,7 @@ featured: false
 tags:
   - qubit
   - quantum-computing
-cover: ./hero.png
+cover: ./hero.webp
 lang: fa
 ---
 ## کامپیوترهای کوانتومی

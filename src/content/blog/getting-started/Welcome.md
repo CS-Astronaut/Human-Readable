@@ -6,9 +6,9 @@ featured: true
 tags:
   - Computer-Science
   - -h
-cover: ./hero.png
+cover: ./hero.webp
 ---
-![hero](./hero.png)
+![hero](./hero.webp)
 
 Well first things first i'm so happy to announce my first blog post website, It's been a so long time since I wanted to have one! since there is so many cool stuff i face in this `Computer Science` journey of mine i thought that it should be cool to document some online.
 

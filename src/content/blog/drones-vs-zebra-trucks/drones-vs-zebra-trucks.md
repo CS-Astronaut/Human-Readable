@@ -8,10 +8,10 @@ tags:
   - Computer-Vision
   - camouflaged
   - Modern-Warfare
-cover: ./hero.png
+cover: ./hero.webp
 lang: fa
 ---
-![camouflaged-truck](hero.png)
+![camouflaged-truck](hero.webp)
 
 فرض کنید به عنوان مسئول استتار کامیون مهمات لجیستیک میاید و کامیون رو به شکل راه راه رنگ میزنید تا از دست پهپاد های اوکراینی در امان بمونید. اما چرا اینکار رو میکنید؟
 ### لینک خبر:
