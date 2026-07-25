@@ -1,5 +1,6 @@
 ---
 import '../styles/theme.css';
+import '../styles/katex.min.css';
 import Footer from '../components/Footer.astro';
 
 interface Props {
@@ -41,6 +42,23 @@ const { title, description, ogImage, lang = "en", dir = "ltr" } = Astro.props;
       rel="stylesheet"
     />
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=VT323&display=swap" rel="stylesheet">
+
+    <style is:global>
+      /* Hide the MathML rendering when KaTeX HTML is present to prevent double rendering */
+      .katex-mathml {
+        display: none !important;
+      }
+      /* Ensure math elements are always rendered left-to-right (LTR) with left alignment */
+      .katex {
+        direction: ltr !important;
+        unicode-bidi: embed !important;
+        text-align: left !important;
+      }
+      .katex-display {
+        direction: ltr !important;
+        text-align: center !important;
+      }
+    </style>
 
 
     <!-- Open Graph -->
