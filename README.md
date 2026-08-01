@@ -26,8 +26,9 @@ A minimal, retro-arcade themed blog for computer science, AI and technology post
 | 2 | [drones-vs-zebra-trucks](https://cs-astronaut.github.io/Human-Readable/blog/drones-vs-zebra-trucks/) | 2026-06-28 | [@CS-Astronaut](https://github.com/CS-Astronaut) |
 | 3 | [qubit](https://cs-astronaut.github.io/Human-Readable/blog/qubit/) | 2026-07-04 | [@grep-FOX](https://github.com/grep-FOX) |
 | 4 | [dithering](https://cs-astronaut.github.io/Human-Readable/blog/dithering/) | 2026-07-14 | [@CS-Astronaut](https://github.com/CS-Astronaut) |
+| 5 | [ai-agents](https://cs-astronaut.github.io/Human-Readable/blog/ai-agents/) | 2026-07-26 | [@CS-Astronaut](https://github.com/CS-Astronaut) |
 
-##         Tech Stack
+##          Tech Stack
 
 - **Framework:** [Astro 6](https://astro.build)
 - **Styling:** CSS with Tokyo Night variables
