@@ -1,5 +1,12 @@
 ---
 import Layout from './Layout.astro';
+import TableOfContents from '../components/TableOfContents.astro';
+
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
 
 interface Props {
   frontmatter: {
@@ -7,13 +14,15 @@ interface Props {
     description: string;
     pubDate: Date;
     tags?: string[];
+    lang?: "en" | "fa";
 
     cover?: {
       src: string;
     };
   };
+  headings?: Heading[];
 }
-const { frontmatter } = Astro.props;
+const { frontmatter, headings = [] } = Astro.props;
 const isRTL = frontmatter.lang === "fa";
 
 
@@ -32,6 +41,8 @@ const pubDate = new Date(frontmatter.pubDate).toLocaleDateString('en-US', {
 <Layout title={frontmatter.title} description={frontmatter.description} ogImage={ogImage}  lang={frontmatter.lang ?? "en"} dir={isRTL ? "rtl" : "ltr"}>
   <article class="post">
     <div class="container">
+      <div class="post-layout">
+      <div class="post-main">
       <header class="post-header">
         <div class="header-title-container">
           <h1>{frontmatter.title}</h1>
@@ -59,13 +70,10 @@ const pubDate = new Date(frontmatter.pubDate).toLocaleDateString('en-US', {
       <div class="post-content">
         <slot />
       </div>
+      </div>
 
-      <footer class="post-footer">
-        <hr />
-        <nav class="post-nav">
-          <a href={import.meta.env.BASE_URL} class="back-link">← back to posts</a>
-        </nav>
-      </footer>
+      <TableOfContents headings={headings} />
+      </div>
     </div>
   </article>
 </Layout>
@@ -92,12 +100,53 @@ const pubDate = new Date(frontmatter.pubDate).toLocaleDateString('en-US', {
     padding: 2rem 0;
   }
 
+  /* Room for the sticky sidebar next to the article */
+  .container {
+    max-width: 1080px;
+  }
+
+  .post-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 720px) minmax(0, 260px);
+    column-gap: 3rem;
+    justify-content: center;
+  }
+
+  .post-main {
+    grid-column: 1;
+    align-self: start;
+    min-width: 0;
+  }
+
+  .post-layout :global(.toc-sidebar) {
+    grid-column: 2;
+    grid-row: 1 / -1;
+  }
+
+  /* Keep anchored headings clear of the sticky site header */
+  .post-content :global(h2),
+  .post-content :global(h3) {
+    scroll-margin-top: 120px;
+  }
+
   .post-header {
-    margin-bottom: 3rem;
-    padding-bottom: 2rem;
-    border-bottom: 2px solid var(--color-surface-light);
-    direction: ltr;
-    text-align: left;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--color-surface-light);
+  }
+
+  /* Conventional post title: substantial but restrained */
+  .post-header h1 {
+    font-size: 2.1rem;
+    line-height: 1.25;
+    margin-bottom: 0.5rem;
+    text-shadow: none;
+    text-wrap: balance;
+  }
+
+  .post-meta .date {
+    font-family: "Courier New", monospace;
+    letter-spacing: 0.5px;
   }
 
   .header-title-container {
@@ -168,10 +217,10 @@ const pubDate = new Date(frontmatter.pubDate).toLocaleDateString('en-US', {
 
   .post-meta {
     display: flex;
-    gap: 1.5rem;
-    margin-top: 1rem;
+    gap: 1.25rem;
+    margin-top: 0.75rem;
     color: var(--color-text-dim);
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     flex-wrap: wrap;
   }
 
@@ -191,10 +240,9 @@ const pubDate = new Date(frontmatter.pubDate).toLocaleDateString('en-US', {
   }
 
   .post-description {
-    font-size: 1.15rem;
+    font-size: 1.05rem;
     color: var(--color-text-dim);
-    margin-top: 1rem;
-    font-style: italic;
+    margin-top: 0.75rem;
   }
 
   .post-content {
@@ -228,22 +276,35 @@ const pubDate = new Date(frontmatter.pubDate).toLocaleDateString('en-US', {
     text-align: left;
   }
 
-  .post-footer {
-    margin-top: 3rem;
-  }
+  @media (max-width: 1080px) {
+    .container {
+      max-width: 800px;
+    }
 
-  .back-link {
-    display: inline-block;
-    margin-top: 1rem;
-    padding: 0.5rem 1rem;
-    border: 1px solid var(--color-primary);
-    border-radius: 2px;
-    transition: all 0.2s ease;
-  }
+    .post-layout {
+      display: flex;
+      flex-direction: column;
+      column-gap: 0;
+    }
 
-  .back-link:hover {
-    background-color: var(--color-surface);
-    text-shadow: var(--glow-primary);
+    /* Unwrap the column wrapper so header/toc/article keep their order */
+    .post-main {
+      display: contents;
+    }
+
+    /* title → toc → article on small screens */
+    .post-header {
+      order: 0;
+    }
+
+    .post-layout :global(.toc-sidebar) {
+      order: 1;
+      margin-bottom: 2rem;
+    }
+
+    .post-content {
+      order: 2;
+    }
   }
 
   @media (max-width: 640px) {
