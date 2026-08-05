@@ -23,9 +23,9 @@ if (!post) {
   return Astro.redirect('/404');
 }
 
-const { Content } = await render(post);
+const { Content, headings } = await render(post);
 ---
 
-<BlogPost frontmatter={post.data}>
+<BlogPost frontmatter={post.data} headings={headings}>
   <Content />
 </BlogPost>
