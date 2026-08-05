@@ -57,6 +57,9 @@ const { title, description, ogImage, lang = "en", dir = "ltr" } = Astro.props;
       .katex-display {
         direction: ltr !important;
         text-align: center !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        -webkit-overflow-scrolling: touch;
       }
     </style>
 
@@ -310,7 +313,7 @@ const { title, description, ogImage, lang = "en", dir = "ltr" } = Astro.props;
       }
 
       .nav-links a {
-        padding: 0.4rem 0.6rem;
+        padding: 0.55rem 0.7rem;
         font-size: 0.8rem;
       }
     }

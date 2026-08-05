@@ -156,6 +156,7 @@ code {
   border-radius: 2px;
   font-size: 0.9em;
   color: var(--color-success);
+  overflow-wrap: anywhere;
 }
 
 pre {
@@ -182,14 +183,17 @@ blockquote {
 
 /* Markdown Tables */
 table {
+  display: block;
   width: 100%;
+  max-width: 100%;
   border-collapse: collapse;
   margin: 1.5rem 0;
   font-size: 0.95rem;
   background-color: var(--color-surface);
   border: 1px solid var(--color-surface-light);
   border-radius: 4px;
-  overflow: hidden;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 th, td {
@@ -232,7 +236,7 @@ hr {
 }
 
 ul, ol {
-  margin-left: 1.5rem;
+  margin-inline-start: 1.5rem;
   margin-bottom: 1rem;
 }
 
