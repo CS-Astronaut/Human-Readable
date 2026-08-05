@@ -1,0 +1,275 @@
+---
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  headings?: Heading[];
+}
+
+const { headings = [] } = Astro.props;
+
+// Only surface h2/h3 as sections; h1 is the post title rendered by the layout.
+const tocHeadings = headings.filter(
+  (h) => h.depth >= 2 && h.depth <= 3 && h.text.trim().length > 0
+);
+---
+
+{tocHeadings.length > 0 && (
+  <aside class="toc-sidebar collapsed" aria-label="Table of contents">
+    <button
+      id="toc-toggle"
+      class="toc-header"
+      type="button"
+      aria-expanded="false"
+      aria-controls="toc-nav"
+    >
+      <span class="toc-title">contents</span>
+      <span class="toc-arrow" aria-hidden="true">▾</span>
+    </button>
+
+    <nav id="toc-nav" class="toc-nav" aria-label="Sections in this post">
+      <ul class="toc-list">
+        {tocHeadings.map((h) => (
+          <li class={`toc-item depth-${h.depth}`}>
+            <a class="toc-link" href={`#${encodeURIComponent(h.slug)}`}>
+              {h.text}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </aside>
+)}
+
+<script>
+  const sidebar = document.querySelector('.toc-sidebar');
+  const toggle = document.getElementById('toc-toggle');
+
+  if (sidebar && toggle) {
+    const desktopMq = window.matchMedia('(min-width: 1081px)');
+
+    const syncAria = () => {
+      toggle.setAttribute(
+        'aria-expanded',
+        String(!sidebar.classList.contains('collapsed'))
+      );
+    };
+
+    // Mobile: expand/collapse the list. Desktop: always visible, no-op.
+    toggle.addEventListener('click', () => {
+      if (desktopMq.matches) return;
+      sidebar.classList.toggle('collapsed');
+      syncAria();
+    });
+
+    // Scrollspy — highlight the section currently in view
+    const links = Array.from(sidebar.querySelectorAll('.toc-link'));
+    const targets = links
+      .map((link) => {
+        const hash = link.getAttribute('href') ?? '';
+        try {
+          return document.getElementById(decodeURIComponent(hash.slice(1)));
+        } catch {
+          return null;
+        }
+      })
+      .filter((el): el is HTMLElement => Boolean(el));
+
+    const OFFSET = 120;
+
+    const updateActive = () => {
+      let activeIndex = -1;
+      for (let i = 0; i < targets.length; i++) {
+        if (targets[i].getBoundingClientRect().top <= OFFSET) activeIndex = i;
+      }
+      // At the very bottom of the page, the last section is "active"
+      if (
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 2
+      ) {
+        activeIndex = targets.length - 1;
+      }
+      links.forEach((link, i) => link.classList.toggle('active', i === activeIndex));
+    };
+
+    window.addEventListener('scroll', updateActive, { passive: true });
+    window.addEventListener('resize', updateActive);
+
+    links.forEach((link) => {
+      link.addEventListener('click', () => {
+        // On mobile, jumping via a collapsed TOC expands it first
+        if (!desktopMq.matches && sidebar.classList.contains('collapsed')) {
+          sidebar.classList.remove('collapsed');
+          syncAria();
+        }
+        links.forEach((l) => l.classList.remove('active'));
+        link.classList.add('active');
+      });
+    });
+
+    if (desktopMq.matches) syncAria();
+    updateActive();
+  }
+</script>
+
+<style>
+  .toc-sidebar {
+    position: sticky;
+    top: 110px;
+    align-self: start;
+    max-height: calc(100vh - 130px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-surface-light) transparent;
+
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-surface-light);
+    border-top: 2px solid var(--color-primary);
+    border-radius: 2px;
+    font-size: 0.9rem;
+  }
+
+  .toc-sidebar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .toc-sidebar::-webkit-scrollbar-thumb {
+    background-color: var(--color-surface-light);
+    border-radius: 3px;
+  }
+
+  .toc-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    width: 100%;
+    padding: 0.8rem 1rem 0.7rem;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--color-surface-light);
+    color: var(--color-primary);
+    font-family: "Courier New", monospace;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+
+  .toc-header:hover {
+    color: var(--color-accent);
+  }
+
+  .toc-arrow {
+    color: var(--color-accent-warm);
+    transition: transform 0.25s ease;
+    flex-shrink: 0;
+  }
+
+  .toc-sidebar:not(.collapsed) .toc-arrow {
+    transform: rotate(180deg);
+  }
+
+  .toc-nav {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.3s ease;
+  }
+
+  /* Mobile default: collapsed. Desktop forces it open (see media query below). */
+  .toc-sidebar.collapsed .toc-nav {
+    grid-template-rows: 0fr;
+  }
+
+  .toc-sidebar:not(.collapsed) .toc-nav {
+    grid-template-rows: 1fr;
+  }
+
+  .toc-list {
+    list-style: none;
+    margin: 0;
+    padding: 0.6rem 0.5rem 0.75rem;
+    min-height: 0;
+    overflow: hidden;
+    transition: padding 0.3s ease;
+  }
+
+  .toc-item {
+    margin: 0;
+  }
+
+  .toc-link {
+    display: block;
+    padding: 0.3rem 0.6rem;
+    color: var(--color-text-dim);
+    border-inline-start: 2px solid transparent;
+    line-height: 1.45;
+    word-break: break-word;
+    transition: all 0.15s ease;
+  }
+
+  .toc-link:hover {
+    color: var(--color-primary);
+    background-color: rgba(122, 162, 247, 0.06);
+    border-inline-start-color: var(--color-primary);
+  }
+
+  .toc-link.active {
+    color: var(--color-primary);
+    border-inline-start-color: var(--color-primary);
+    background-color: rgba(122, 162, 247, 0.1);
+    text-shadow: var(--glow-primary);
+  }
+
+  .toc-item.depth-3 .toc-link {
+    padding-inline-start: 1.4rem;
+    font-size: 0.85rem;
+  }
+
+  /* Desktop: the header is a static label, not a toggle */
+  @media (min-width: 1081px) {
+    .toc-arrow {
+      display: none;
+    }
+
+    .toc-sidebar.collapsed .toc-nav {
+      grid-template-rows: 1fr;
+    }
+
+    /* Desktop: the sidebar scrolls, not the list */
+    .toc-list {
+      overflow-y: visible;
+    }
+  }
+
+  @media (max-width: 1080px) {
+    .toc-sidebar {
+      position: static;
+      max-height: none;
+    }
+
+    /* Collapsed: strip the list padding so the 0fr row collapses fully */
+    .toc-sidebar.collapsed .toc-list {
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+
+    /* When expanded on mobile, cap the list so a long TOC
+       doesn't push the article far down the page */
+    .toc-sidebar:not(.collapsed) .toc-list {
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+
+    /* Comfortable tap targets on touch screens */
+    .toc-link {
+      padding: 0.5rem 0.6rem;
+    }
+  }
+</style>
