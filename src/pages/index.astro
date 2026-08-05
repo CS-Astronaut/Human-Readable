@@ -74,9 +74,8 @@ const getSlug = (post: any) => post.id.split('/').pop()?.replace(/\.md$/, '') ||
           src={featuredPost.data.cover}
           alt=""
           class="card-bg"
-          loading="eager"
           widths={[400, 800]}
-          formats={["webp"]}
+          format="webp"
           loading="eager"
          />
       )}
@@ -90,7 +89,7 @@ const getSlug = (post: any) => post.id.split('/').pop()?.replace(/\.md$/, '') ||
       <section class="posts-section" id="posts">
         <p class="section-label">recent posts</p>
         <div class="posts-list">
-            {recentPosts.map((post) => (
+              {recentPosts.map((post) => (
               <article class="post-card">
               {post.data.cover && (
                   <Image
@@ -98,8 +97,9 @@ const getSlug = (post: any) => post.id.split('/').pop()?.replace(/\.md$/, '') ||
                     alt=""
                     class="card-bg"
                     widths={[400, 800]}
-                    formats={["webp"]}
-                    loading="eager"
+                    format="webp"
+                    loading="lazy"
+                    decoding="async"
                   />
 
                 )}
@@ -153,7 +153,7 @@ const getSlug = (post: any) => post.id.split('/').pop()?.replace(/\.md$/, '') ||
 
   .hero-title {
     font-family: "Workbench", monospace;
-    font-size: 3.5rem;
+    font-size: clamp(2.25rem, 8vw, 3.5rem);
     margin-bottom: 1rem;
     letter-spacing: 3px;
     text-transform: lowercase;
