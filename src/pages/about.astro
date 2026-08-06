@@ -90,13 +90,22 @@ const randomImage =
   z-index: 1;
 
   display: flex;
-  justify-content: center;
-  overflow-x: hidden;
+  flex-direction: column;
+
+  /* FIX 1: Shorthand 'overflow: hidden' clips the ambient glow on both axes, 
+            preventing the browser from forcing 'overflow-y: auto' */
+  overflow: hidden;
+
+  /* FIX 2: 'flex: 1' fills available space without strictly forcing 100% height 
+            before padding is calculated. We also add a safe fallback. */
+  flex: 1;
+  min-height: 100%;
+  box-sizing: border-box;
 
   padding:
     1rem
     var(--page-padding)
-    3rem;
+    2rem;
 }
 
 /* ==========================================
@@ -107,7 +116,10 @@ const randomImage =
   position: relative;
 
   width: min(100%, var(--terminal-max-width));
+  /* `auto` margins center safely: when there's spare room vertically and
+     horizontally, and never clip the top when space is tight */
   margin-inline: auto;
+  margin-block: auto;
 }
 
 /* Ambient glow */
@@ -152,7 +164,7 @@ const randomImage =
     padding:
       1rem
       1.5rem
-      2rem;
+      1.5rem;
   }
 
 }
@@ -173,9 +185,9 @@ const randomImage =
 
   .about {
     padding:
+      0.75rem
       1rem
-      1rem
-      2rem;
+      1rem;
   }
 
   .terminal-container::before {
@@ -192,5 +204,20 @@ const randomImage =
     filter: none;
   }
 
+}
+
+/* ==========================================
+   ONE-VIEWPORT FIT
+========================================== */
+
+/* Give the fixed-height CRT monitor (min 480px) room to fit in a single
+   viewport: strip the site chrome margins on this page only. These
+   styles ship only with the about page. */
+:global(.site-header) {
+  margin-bottom: 0 !important;
+}
+
+:global(.footer) {
+  margin-top: 0 !important;
 }
 </style>
