@@ -3,7 +3,6 @@ import Layout from '../layouts/Layout.astro';
 import PostList from '../components/PostList.astro';
 import PostCard from '../components/PostCard.astro';
 import { getAllPosts, getPostsPage, getTotalPages } from '../lib/posts';
-import '../styles/theme.css';
 
 // Sort by date (newest first)
 const sortedPosts = await getAllPosts();

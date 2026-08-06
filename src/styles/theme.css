@@ -1,23 +1,5 @@
-/* Tokyo Night Retro-Arcade Theme */
-:root {
-  /* Core palette */
-  --color-bg: #1a1b26;
-  --color-surface: /* #192734; */ #24283b;
-  --color-surface-light: #23314f;
-  --color-primary: #7aa2f7;
-  --color-primary-bright: #bb9af7;
-  --color-accent: #f7768e;
-  --color-accent-warm: #ff9e64;
-  --color-text: #c0caf5;
-  --color-text-dim: #8891b0;
-  --color-success: #9ece6a;
-  
-  /* Arcade glow effect */
-  --glow-primary: 0 0 8px rgba(122, 162, 247, 0.4);
-  --glow-accent: 0 0 8px rgba(247, 118, 142, 0.4);
-  --glow-bright: 0 0 12px rgba(187, 154, 247, 0.5);
-}
-
+/* Nord Retro-Arcade Theme — the base palette and all derived color
+   tokens now live in ./colors.css (edit that file to retheme). */
 * {
   margin: 0;
   padding: 0;
@@ -214,11 +196,11 @@ th {
 }
 
 tr:nth-child(even) {
-  background-color: rgba(255, 255, 255, 0.02);
+  background-color: var(--table-stripe);
 }
 
 tr:hover {
-  background-color: rgba(122, 162, 247, 0.05);
+  background-color: var(--tint-subtle);
 }
 
 /* Table direction handling */

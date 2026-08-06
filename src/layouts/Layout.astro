@@ -1,4 +1,5 @@
 ---
+import '../styles/colors.css';
 import '../styles/theme.css';
 import '../styles/katex.min.css';
 import Footer from '../components/Footer.astro';
@@ -159,10 +160,10 @@ const { title, description, ogImage, lang = "en", dir = "ltr" } = Astro.props;
       top: 0;
       z-index: 100;
       background: var(--color-surface);
-      border-bottom: 1px solid rgba(122, 162, 247, 0.1);
+      border-bottom: 1px solid var(--header-border);
       padding: 1.2rem 0;
       margin-bottom: 3rem;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 4px 20px var(--shadow);
     }
 
     /* Frosted-glass blur is GPU-heavy while scrolling on touch devices:
@@ -171,8 +172,8 @@ const { title, description, ogImage, lang = "en", dir = "ltr" } = Astro.props;
       .site-header {
         background: linear-gradient(
           180deg,
-          rgba(26, 27, 38, 0.95) 0%,
-          rgba(26, 27, 38, 0.85) 100%
+          var(--header-bg-top) 0%,
+          var(--header-bg-bottom) 100%
         );
         backdrop-filter: blur(10px);
       }
@@ -209,7 +210,7 @@ const { title, description, ogImage, lang = "en", dir = "ltr" } = Astro.props;
 
     .site-title:hover {
       color: var(--color-accent);
-      text-shadow: 0 0 10px rgba(187, 154, 247, 0.5);
+      text-shadow: 0 0 10px var(--title-glow);
     }
 
     .title-text {
@@ -250,9 +251,9 @@ const { title, description, ogImage, lang = "en", dir = "ltr" } = Astro.props;
 
     .nav-links a:hover {
       color: var(--color-primary);
-      background-color: rgba(122, 162, 247, 0.08);
-      border-color: rgba(122, 162, 247, 0.3);
-      box-shadow: 0 0 12px rgba(122, 162, 247, 0.2);
+      background-color: var(--hover-bg);
+      border-color: var(--accent-strong);
+      box-shadow: 0 0 12px var(--hover-glow);
     }
 
     .nav-links a::before {
