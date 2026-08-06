@@ -154,6 +154,18 @@ animation:flicker .18s infinite;
 
 }
 
+/* The infinite flicker forces a repaint ~5x/sec, which stutters scrolling
+   on touch devices; it also adds nothing when motion is reduced */
+@media (prefers-reduced-motion: reduce), (pointer: coarse) {
+
+.crt-terminal{
+
+animation:none;
+
+}
+
+}
+
 
 @media(max-width:700px){
 
