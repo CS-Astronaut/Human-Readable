@@ -1,0 +1,314 @@
+---
+const searchUrl = import.meta.env.BASE_URL + 'search.json';
+---
+
+<div class="search-wrap" data-search-url={searchUrl}>
+  <div class="search-box">
+    <span class="search-prompt" aria-hidden="true">&gt;</span>
+    <input
+      id="post-search"
+      class="search-input"
+      type="text"
+      placeholder="search posts..."
+      autocomplete="off"
+      spellcheck="false"
+      aria-label="search posts"
+    />
+    <button class="search-clear" type="button" aria-label="clear search" hidden>✕</button>
+  </div>
+
+  <div class="search-results" hidden aria-live="polite"></div>
+</div>
+
+<script>
+  const wrap = document.querySelector('.search-wrap');
+
+  if (wrap) {
+    const input = wrap.querySelector('.search-input');
+    const clearBtn = wrap.querySelector('.search-clear');
+    const results = wrap.querySelector('.search-results');
+    const list = document.querySelector('.posts-list');
+    const pager = document.querySelector('.post-pagination');
+    const searchUrl = wrap.dataset.searchUrl;
+
+    let index = null;
+    let timer = null;
+
+    const escapeHtml = (s) =>
+      String(s).replace(/[&<>"']/g, (c) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;',
+      }[c]));
+
+    const formatDate = (iso) =>
+      new Date(iso).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      });
+
+    async function loadIndex() {
+      if (index) return index;
+      try {
+        const res = await fetch(searchUrl);
+        index = res.ok ? await res.json() : [];
+      } catch {
+        index = [];
+      }
+      return index;
+    }
+
+    function cardHtml(post) {
+      const tags = (post.tags || [])
+        .map((t) => `<span class="search-card-tag">#${escapeHtml(t)}</span>`)
+        .join('');
+      const cover = post.cover
+        ? `<img class="search-card-bg" src="${post.cover}"${post.coverSrcSet ? ` srcset="${post.coverSrcSet}"` : ''} alt="" decoding="async">`
+        : '';
+      return `
+        <article class="search-card">
+          ${cover}
+          <div class="search-card-content">
+            <h3 class="search-card-title">
+              <a href="${import.meta.env.BASE_URL}blog/${encodeURIComponent(post.slug)}">${escapeHtml(post.title)}</a>
+            </h3>
+            ${post.description ? `<p class="search-card-desc">${escapeHtml(post.description)}</p>` : ''}
+            <div class="search-card-footer">
+              <span class="search-card-date">${formatDate(post.pubDate)}</span>
+              ${tags ? `<div class="search-card-tags">${tags}</div>` : ''}
+            </div>
+          </div>
+        </article>`;
+    }
+
+    function runSearch() {
+      const q = input.value.trim();
+      clearBtn.hidden = q === '';
+
+      if (q.length < 2) {
+        results.hidden = true;
+        results.innerHTML = '';
+        if (list) list.hidden = false;
+        if (pager) pager.hidden = false;
+        return;
+      }
+
+      loadIndex().then((posts) => {
+        const needle = q.toLowerCase();
+        const hits = posts.filter((p) =>
+          `${p.title} ${p.description || ''} ${(p.tags || []).join(' ')}`
+            .toLowerCase()
+            .includes(needle)
+        );
+
+        if (list) list.hidden = true;
+        if (pager) pager.hidden = true;
+        results.hidden = false;
+        results.innerHTML = hits.length
+          ? hits.map(cardHtml).join('')
+          : `<p class="search-none">no results for "${escapeHtml(q)}"</p>`;
+      });
+    }
+
+    input.addEventListener('input', () => {
+      clearTimeout(timer);
+      timer = setTimeout(runSearch, 150);
+    });
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') clearBtn.click();
+    });
+
+    clearBtn.addEventListener('click', () => {
+      input.value = '';
+      input.focus();
+      input.dispatchEvent(new Event('input'));
+    });
+  }
+</script>
+
+<style>
+  .search-wrap {
+    display: contents;
+  }
+
+  .search-box {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-surface-light);
+    border-radius: 2px;
+    padding: 0.45rem 0.75rem;
+    min-width: 260px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .search-box:focus-within {
+    border-color: var(--color-primary);
+    box-shadow: var(--glow-primary);
+  }
+
+  .search-prompt {
+    color: var(--color-accent-warm);
+    font-family: "Courier New", monospace;
+    font-weight: bold;
+    font-size: 0.9rem;
+  }
+
+  .search-input {
+    flex: 1;
+    min-width: 0;
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--color-text);
+    font-family: "Courier New", monospace;
+    font-size: 0.9rem;
+  }
+
+  .search-input::placeholder {
+    color: var(--color-text-dim);
+  }
+
+  .search-clear {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: var(--color-text-dim);
+    font-size: 0.8rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    transition: color 0.2s ease;
+  }
+
+  .search-clear:hover {
+    color: var(--color-accent);
+  }
+
+  .search-results {
+    grid-column: 1 / -1;
+    margin-top: 1rem;
+  }
+
+  .search-results[hidden] {
+    display: none;
+  }
+
+  /* Cards are injected at runtime, so they can't use scoped styles */
+  .search-results :global(.search-card) {
+    position: relative;
+    padding: 1.5rem;
+    border: 1px solid var(--color-surface-light);
+    border-radius: 2px;
+    background-color: var(--color-surface);
+    transition: all 0.25s ease;
+    margin-bottom: 1.5rem;
+    overflow: hidden; /* important for image clipping */
+  }
+
+  .search-results :global(.search-card-bg) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+
+    /* makes it subtle + moody */
+    opacity: 0.25;
+    filter: blur(2px) brightness(0.7) saturate(1.2);
+
+    transform: scale(1.1); /* avoids blur edges showing */
+    z-index: 0;
+  }
+
+  .search-results :global(.search-card)::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(26, 27, 38, 0.4);
+    z-index: 1;
+  }
+
+  .search-results :global(.search-card-content) {
+    position: relative;
+    z-index: 2;
+  }
+
+  .search-results :global(.search-card:hover) {
+    border-color: var(--color-primary);
+    box-shadow: var(--glow-primary);
+  }
+
+  .search-results :global(.search-card-title) {
+    margin: 0 0 0.75rem;
+  }
+
+  .search-results :global(.search-card-title a) {
+    color: var(--color-primary);
+    transition: color 0.2s ease;
+  }
+
+  .search-results :global(.search-card-title a:hover) {
+    color: var(--color-accent);
+  }
+
+  .search-results :global(.search-card-desc) {
+    color: var(--color-text-dim);
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+  }
+
+  .search-results :global(.search-card-footer) {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.85rem;
+  }
+
+  .search-results :global(.search-card-date) {
+    color: var(--color-text-dim);
+    font-family: "Courier New", monospace;
+  }
+
+  .search-results :global(.search-card-tags) {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .search-results :global(.search-card-tag) {
+    color: var(--color-accent-warm);
+    background-color: rgba(122, 162, 247, 0.1);
+    padding: 0.2rem 0.6rem;
+    border-radius: 2px;
+    border: 1px solid var(--color-accent-warm);
+  }
+
+  .search-results :global(.search-none) {
+    color: var(--color-text-dim);
+    font-style: italic;
+    padding: 1rem 0;
+  }
+
+  @media (max-width: 640px) {
+    .search-box {
+      min-width: 0;
+      width: 100%;
+    }
+
+    .search-results :global(.search-card) {
+      padding: 1rem;
+    }
+
+    .search-results :global(.search-card-footer) {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>

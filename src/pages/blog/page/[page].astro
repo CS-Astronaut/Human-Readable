@@ -1,0 +1,38 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import PostList from '../../../components/PostList.astro';
+import { getAllPosts, getPostsPage, getTotalPages } from '../../../lib/posts';
+
+export async function getStaticPaths() {
+  const sortedPosts = await getAllPosts();
+  const featuredPost = sortedPosts.find((post) => post.data.featured) || sortedPosts[0];
+  const listing = sortedPosts.filter((post) => post.id !== featuredPost.id);
+  const totalPages = getTotalPages(listing.length);
+
+  // Pages only exist once posts outgrow the first page (POSTS_PER_PAGE)
+  return Array.from({ length: Math.max(0, totalPages - 1) }, (_, i) => {
+    const page = i + 2;
+    return {
+      params: { page: String(page) },
+      props: { page, totalPages },
+    };
+  });
+}
+
+const { page, totalPages } = Astro.props;
+const sortedPosts = await getAllPosts();
+const featuredPost = sortedPosts.find((post) => post.data.featured) || sortedPosts[0];
+const listing = sortedPosts.filter((post) => post.id !== featuredPost.id);
+const pagePosts = getPostsPage(listing, page);
+---
+
+<Layout title={`posts — page ${page}`}>
+  <div class="container">
+    <PostList
+      posts={pagePosts}
+      currentPage={page}
+      totalPages={totalPages}
+      baseHref={import.meta.env.BASE_URL}
+    />
+  </div>
+</Layout>

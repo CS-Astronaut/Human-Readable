@@ -1,0 +1,111 @@
+---
+import PostCard from './PostCard.astro';
+import PostSearch from './PostSearch.astro';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  posts: CollectionEntry<'blog'>[];
+  currentPage: number;
+  totalPages: number;
+  baseHref: string;
+}
+
+const { posts, currentPage, totalPages, baseHref } = Astro.props;
+
+const pageLabel = currentPage === 1 ? 'recent posts' : `posts — page ${currentPage}`;
+const newerHref = currentPage === 2 ? baseHref : `${baseHref}blog/page/${currentPage - 1}/`;
+const olderHref = `${baseHref}blog/page/${currentPage + 1}/`;
+---
+
+<section class="posts-section" id="posts">
+  <div class="section-head">
+    <p class="section-label">{pageLabel}</p>
+    <PostSearch />
+  </div>
+
+  <div class="posts-list">
+    {posts.map((post) => <PostCard post={post} />)}
+  </div>
+
+  {totalPages > 1 && (
+    <nav class="post-pagination" aria-label="posts pagination">
+      {currentPage > 1 && <a class="page-link" href={newerHref}>← newer</a>}
+      <span class="page-indicator">{currentPage} / {totalPages}</span>
+      {currentPage < totalPages && <a class="page-link" href={olderHref}>older →</a>}
+    </nav>
+  )}
+</section>
+
+<style>
+  .posts-section {
+    margin-bottom: 2rem;
+  }
+
+  .section-head {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 1rem 2rem;
+    border-bottom: 1px dotted var(--color-surface-light);
+    padding-bottom: 1rem;
+  }
+
+  .section-label {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--color-text-dim);
+    margin: 0;
+  }
+
+  .posts-list {
+    display: flex;
+    flex-direction: column;
+    margin-top: 1.5rem;
+  }
+
+  .posts-list[hidden],
+  .post-pagination[hidden] {
+    display: none;
+  }
+
+  .post-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.25rem;
+    border-top: 1px dotted var(--color-surface-light);
+  }
+
+  .page-link {
+    font-family: "Courier New", monospace;
+    text-transform: lowercase;
+    padding: 0.5rem 0.9rem;
+    border: 1px solid var(--color-surface-light);
+    border-radius: 2px;
+    color: var(--color-primary);
+    background-color: var(--color-surface);
+    transition: all 0.2s ease;
+  }
+
+  .page-link:hover {
+    border-color: var(--color-primary);
+    color: var(--color-accent);
+    box-shadow: var(--glow-primary);
+  }
+
+  .page-indicator {
+    font-family: "Courier New", monospace;
+    color: var(--color-text-dim);
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+  }
+
+  @media (max-width: 640px) {
+    .section-head {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
