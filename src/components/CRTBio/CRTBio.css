@@ -10,7 +10,7 @@
 
     padding:.8rem;
     overflow:hidden;
-    min-height: clamp(480px, 60vh, 650px);
+    min-height: clamp(360px, 60vh, 650px);
     height: 420px;          /* Fixed monitor height */
 
     box-shadow:
