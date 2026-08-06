@@ -15,33 +15,72 @@ const { headings = [] } = Astro.props;
 const tocHeadings = headings.filter(
   (h) => h.depth >= 2 && h.depth <= 3 && h.text.trim().length > 0
 );
+
+// Group h3 headings under their parent h2 so the tree lines can be drawn
+interface TocNode extends Heading {
+  children: Heading[];
+}
+
+const tree: TocNode[] = [];
+for (const h of tocHeadings) {
+  if (h.depth === 2) {
+    tree.push({ ...h, children: [] });
+  } else if (h.depth === 3) {
+    const parent = tree[tree.length - 1];
+    if (parent) {
+      parent.children.push(h);
+    } else {
+      tree.push({ ...h, children: [] }); // orphan h3: render flat, no tree line
+    }
+  }
+}
 ---
 
 {tocHeadings.length > 0 && (
-  <aside class="toc-sidebar collapsed" aria-label="Table of contents">
-    <button
-      id="toc-toggle"
-      class="toc-header"
-      type="button"
-      aria-expanded="false"
-      aria-controls="toc-nav"
-    >
-      <span class="toc-title">contents</span>
-      <span class="toc-arrow" aria-hidden="true">▾</span>
-    </button>
+  <>
+    <aside class="toc-sidebar collapsed" aria-label="Table of contents">
+      <div class="toc-header">
+        <button
+          id="toc-toggle"
+          class="toc-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="toc-nav"
+        >
+          <span class="toc-title">contents</span>
+          <span class="toc-arrow" aria-hidden="true">▾</span>
+        </button>
+        <button id="toc-top" class="toc-top" type="button" aria-label="back to top" title="back to top">↑</button>
+      </div>
 
     <nav id="toc-nav" class="toc-nav" aria-label="Sections in this post">
       <ul class="toc-list">
-        {tocHeadings.map((h) => (
-          <li class={`toc-item depth-${h.depth}`}>
-            <a class="toc-link" href={`#${encodeURIComponent(h.slug)}`}>
-              {h.text}
+        {tree.map((node) => (
+          <li class="toc-item depth-2">
+            <a class="toc-link" href={`#${encodeURIComponent(node.slug)}`}>
+              {node.text}
             </a>
+            {node.children.length > 0 && (
+              <ul class="toc-sub">
+                {node.children.map((child) => (
+                  <li class="toc-item depth-3">
+                    <a class="toc-link" href={`#${encodeURIComponent(child.slug)}`}>
+                      {child.text}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
           </li>
         ))}
       </ul>
     </nav>
-  </aside>
+    </aside>
+
+    {/* Mobile: the TOC isn't sticky, so a floating go-up that appears
+        once the reader scrolls past the top */}
+    <button id="toc-floating-top" class="toc-floating-top" type="button" aria-label="back to top" title="back to top">↑</button>
+  </>
 )}
 
 <script>
@@ -79,8 +118,12 @@ const tocHeadings = headings.filter(
       .filter((el): el is HTMLElement => Boolean(el));
 
     const OFFSET = 120;
+    // After a TOC click, ignore scrollspy updates briefly so mid-settle
+    // scroll events (layout shifts, font loads) can't wipe the selection
+    let spySuppressedUntil = 0;
 
     const updateActive = () => {
+      if (Date.now() < spySuppressedUntil) return;
       let activeIndex = -1;
       for (let i = 0; i < targets.length; i++) {
         if (targets[i].getBoundingClientRect().top <= OFFSET) activeIndex = i;
@@ -97,21 +140,63 @@ const tocHeadings = headings.filter(
 
     window.addEventListener('scroll', updateActive, { passive: true });
     window.addEventListener('resize', updateActive);
+    window.addEventListener('scrollend', updateActive);
 
     links.forEach((link) => {
-      link.addEventListener('click', () => {
-        // On mobile, jumping via a collapsed TOC expands it first
+      link.addEventListener('click', (e) => {
+        // Take over navigation: the page's smooth scroll (and, on mobile,
+        // the TOC expansion layout shift) otherwise wipes the active state
+        // mid-animation and can land the heading short of the sticky header.
+        e.preventDefault();
+
+        const hash = link.getAttribute('href') ?? '';
+        let target = null;
+        try {
+          target = document.getElementById(decodeURIComponent(hash.slice(1)));
+        } catch {
+          target = null;
+        }
+        if (!target) return;
+
+        const select = () => {
+          // 'instant' overrides the global scroll-behavior: smooth — the
+          // animated scroll's intermediate events would wipe the active state
+          target.scrollIntoView({ behavior: 'instant', block: 'start' });
+          spySuppressedUntil = Date.now() + 800;
+          links.forEach((l) => l.classList.remove('active'));
+          link.classList.add('active');
+          history.pushState(null, '', hash);
+        };
+
+        // On mobile, expand the TOC first and wait for its transition so the
+        // article layout is stable before scrolling to the heading
         if (!desktopMq.matches && sidebar.classList.contains('collapsed')) {
           sidebar.classList.remove('collapsed');
           syncAria();
+          setTimeout(select, 350);
+        } else {
+          select();
         }
-        links.forEach((l) => l.classList.remove('active'));
-        link.classList.add('active');
       });
     });
 
     if (desktopMq.matches) syncAria();
     updateActive();
+  }
+
+  // Go-to-top: header button (desktop) + floating FAB (mobile, TOC not sticky)
+  const topBtn = document.getElementById('toc-top');
+  const floatingTop = document.getElementById('toc-floating-top');
+
+  if (topBtn) {
+    topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  }
+
+  if (floatingTop) {
+    floatingTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    const onScroll = () => floatingTop.classList.toggle('visible', window.scrollY > 500);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
   }
 </script>
 
@@ -145,25 +230,95 @@ const tocHeadings = headings.filter(
   .toc-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
+    gap: 0.5rem;
     width: 100%;
     padding: 0.8rem 1rem 0.7rem;
     background: none;
     border: none;
     border-bottom: 1px solid var(--color-surface-light);
-    color: var(--color-primary);
     font-family: "Courier New", monospace;
     text-transform: uppercase;
     letter-spacing: 1.5px;
     font-size: 0.75rem;
     font-weight: bold;
+  }
+
+  .toc-toggle {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--color-primary);
+    font: inherit;
+    letter-spacing: inherit;
     cursor: pointer;
     transition: color 0.2s ease;
   }
 
-  .toc-header:hover {
+  .toc-toggle:hover {
     color: var(--color-accent);
+  }
+
+  .toc-top {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    padding: 0.25rem 0.4rem;
+    color: var(--color-text-dim);
+    font-family: "Courier New", monospace;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+
+  .toc-top:hover {
+    color: var(--color-accent);
+  }
+
+  .toc-floating-top {
+    position: fixed;
+    bottom: 1.25rem;
+    inset-inline-end: 1.25rem;
+    z-index: 50;
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    border: 1px solid var(--color-surface-light);
+    border-radius: 2px;
+    color: var(--color-primary);
+    font-family: "Courier New", monospace;
+    font-size: 1.1rem;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    transition:
+      opacity 0.25s ease,
+      transform 0.25s ease,
+      visibility 0.25s,
+      color 0.2s ease,
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .toc-floating-top.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+  }
+
+  .toc-floating-top:hover {
+    color: var(--color-accent);
+    border-color: var(--color-primary);
+    box-shadow: var(--glow-primary);
   }
 
   .toc-arrow {
@@ -227,14 +382,45 @@ const tocHeadings = headings.filter(
     text-shadow: var(--glow-primary);
   }
 
+  .toc-sub {
+    list-style: none;
+    margin: 0;
+    /* align the dashed tree line with the h2 text start */
+    margin-inline-start: 0.6rem;
+    /* gap between the tree line and the h3 text */
+    padding-inline-start: 1rem;
+    border-inline-start: 1px dashed var(--color-surface-light);
+  }
+
+  .toc-item.depth-3 {
+    position: relative;
+  }
+
+  /* horizontal dashed elbow connecting each h3 to the tree line */
+  .toc-item.depth-3::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: -1rem;
+    top: 50%;
+    width: 1rem;
+    border-top: 1px dashed var(--color-surface-light);
+  }
+
+  .toc-item.depth-3:has(.toc-link.active)::before {
+    border-top-color: var(--color-primary);
+  }
+
   .toc-item.depth-3 .toc-link {
-    padding-inline-start: 1.4rem;
     font-size: 0.85rem;
   }
 
   /* Desktop: the header is a static label, not a toggle */
   @media (min-width: 1081px) {
     .toc-arrow {
+      display: none;
+    }
+
+    .toc-floating-top {
       display: none;
     }
 
@@ -252,6 +438,9 @@ const tocHeadings = headings.filter(
     .toc-sidebar {
       position: static;
       max-height: none;
+      /* override the desktop grid align-self so the TOC spans the full width */
+      align-self: stretch;
+      width: 100%;
     }
 
     /* Collapsed: strip the list padding so the 0fr row collapses fully */
