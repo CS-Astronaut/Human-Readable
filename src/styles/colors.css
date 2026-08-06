@@ -1,0 +1,60 @@
+/* ============================================================
+   COLOR SCHEME — single source of truth for the whole site.
+
+   To retheme the site: edit the base palette below. Every derived
+   token re-tints automatically because it is built from the base
+   with color-mix(); you never have to hunt for stale rgba() values.
+   ============================================================ */
+
+:root {
+  /* ---- Base palette (Tokyo Night) ---- */
+  --color-bg: #1a1b26;             /* Void Blue */
+  --color-surface: #24283b;        /* Nebula Surface */
+  --color-surface-light: #292e42;  /* lighter surface block */
+  --color-primary: #7dcfff;        /* Cyan Glow */
+  --color-primary-bright: #c0caf5; /* Starlight */
+  --color-accent: #bb9af7;         /* Cosmic Purple */
+  --color-accent-warm: #ff9e64;    /* Supernova */
+  --color-text: #c0caf5;           /* Starlight */
+  --color-text-dim: #565f89;       /* Distant Gray */
+  --color-success: #9ece6a;        /* Tokyo Night Green */
+
+  /* ---- Arcade glows ---- */
+  --glow-primary: 0 0 8px color-mix(in srgb, var(--color-primary) 40%, transparent);
+  --glow-accent: 0 0 8px color-mix(in srgb, var(--color-accent) 40%, transparent);
+  --glow-bright: 0 0 12px color-mix(in srgb, var(--color-primary-bright) 50%, transparent);
+
+  /* ---- Derived from --color-bg ---- */
+  --header-bg-top: color-mix(in srgb, var(--color-bg) 95%, transparent);
+  --header-bg-bottom: color-mix(in srgb, var(--color-bg) 85%, transparent);
+  --vignette-soft: color-mix(in srgb, var(--color-bg) 8%, transparent);
+  --vignette: color-mix(in srgb, var(--color-bg) 45%, transparent);
+  --vignette-strong: color-mix(in srgb, var(--color-bg) 92%, transparent);
+  --image-overlay: color-mix(in srgb, var(--color-bg) 40%, transparent);
+
+  /* ---- Derived from --color-primary ---- */
+  --header-border: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  --tint-subtle: color-mix(in srgb, var(--color-primary) 5%, transparent);
+  --tint-strong: color-mix(in srgb, var(--color-primary) 15%, transparent);
+  --hover-bg: color-mix(in srgb, var(--color-primary) 8%, transparent);
+  --accent-bg: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  --accent-strong: color-mix(in srgb, var(--color-primary) 30%, transparent);
+  --hover-glow: color-mix(in srgb, var(--color-primary) 20%, transparent);
+  --glow-faint: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  --text-glow: color-mix(in srgb, var(--color-primary) 35%, transparent);
+  --title-glow: color-mix(in srgb, var(--color-primary) 50%, transparent);
+  --terminal-glow: color-mix(in srgb, var(--color-primary) 8%, transparent);
+  --terminal-glow-soft: color-mix(in srgb, var(--color-primary) 5%, transparent);
+  --terminal-glow-faint: color-mix(in srgb, var(--color-primary) 2%, transparent);
+
+  /* ---- Derived from other bases ---- */
+  --success-glow: color-mix(in srgb, var(--color-success) 30%, transparent);
+
+  /* ---- Neutrals (shadows & scanlines) ---- */
+  --shadow-weak: color-mix(in srgb, #000000 25%, transparent);
+  --shadow: color-mix(in srgb, #000000 30%, transparent);
+  --shadow-strong: color-mix(in srgb, #000000 35%, transparent);
+  --table-stripe: color-mix(in srgb, #ffffff 2%, transparent);
+  --scanline: color-mix(in srgb, #ffffff 2.5%, transparent);
+  --crt-inner-glow: color-mix(in srgb, #ffffff 2%, transparent);
+}
