@@ -23,6 +23,17 @@ const { title, description, ogImage, lang = "en", dir = "ltr" } = Astro.props;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+    <script is:inline>
+      (function () {
+        try {
+          var t = localStorage.getItem('theme');
+          if (t === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+          }
+        } catch (e) {}
+      })();
+    </script>
+
     <title>{title} -h</title>
 
     <meta
@@ -119,7 +130,23 @@ const { title, description, ogImage, lang = "en", dir = "ltr" } = Astro.props;
               <li><a href={import.meta.env.BASE_URL}>home</a></li>
               <li><a href={`${import.meta.env.BASE_URL}#posts`}>posts</a></li>
               <li><a href={import.meta.env.BASE_URL + 'about'}>about</a></li>
-
+              <li>
+                <button
+                  id="theme-toggle"
+                  class="theme-toggle"
+                  type="button"
+                  aria-label="Switch to light theme"
+                  title="Toggle theme"
+                >
+                  <svg class="icon icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="4"></circle>
+                    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+                  </svg>
+                  <svg class="icon icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                  </svg>
+                </button>
+              </li>
             </ul>
           </nav>
         </div>
@@ -136,6 +163,35 @@ const { title, description, ogImage, lang = "en", dir = "ltr" } = Astro.props;
       />
     </body>
   </html>
+
+  <script>
+    const root = document.documentElement;
+    const btn = document.getElementById('theme-toggle');
+
+    function applyTheme(theme) {
+      if (theme === 'light') {
+        root.setAttribute('data-theme', 'light');
+      } else {
+        root.removeAttribute('data-theme');
+      }
+      if (btn) {
+        const light = theme === 'light';
+        btn.setAttribute('aria-pressed', String(light));
+        btn.setAttribute('aria-label', light ? 'Switch to dark theme' : 'Switch to light theme');
+      }
+      try {
+        localStorage.setItem('theme', theme);
+      } catch (e) {}
+    }
+
+    if (btn) {
+      applyTheme(root.getAttribute('data-theme') || 'dark');
+      btn.addEventListener('click', () => {
+        const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+        applyTheme(next);
+      });
+    }
+  </script>
 
   <style>
 
@@ -272,6 +328,51 @@ const { title, description, ogImage, lang = "en", dir = "ltr" } = Astro.props;
       width: 100%;
     }
 
+    .theme-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.95rem;
+      color: var(--color-text-dim);
+      background: none;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: all 0.25s ease;
+    }
+
+    .theme-toggle .icon {
+      display: block;
+      width: 18px;
+      height: 18px;
+    }
+
+    .theme-toggle .icon-moon {
+      display: none;
+    }
+
+    .theme-toggle:hover {
+      color: var(--color-primary);
+      background-color: var(--hover-bg);
+      border-color: var(--accent-strong);
+      box-shadow: 0 0 12px var(--hover-glow);
+    }
+
+    .theme-toggle:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 2px;
+    }
+
+    :global(:root[data-theme="light"]) .theme-toggle .icon-sun {
+      display: none;
+    }
+
+    :global(:root[data-theme="light"]) .theme-toggle .icon-moon {
+      display: block;
+    }
+
     /* main { */
     /*   min-height: calc(100vh - 300px); */
     /* } */
@@ -292,6 +393,10 @@ const { title, description, ogImage, lang = "en", dir = "ltr" } = Astro.props;
       .nav-links a {
         padding: 0.5rem 0.8rem;
         font-size: 0.85rem;
+      }
+
+      .theme-toggle {
+        padding: 0.5rem 0.8rem;
       }
     }
 
@@ -320,6 +425,10 @@ const { title, description, ogImage, lang = "en", dir = "ltr" } = Astro.props;
       .nav-links a {
         padding: 0.55rem 0.7rem;
         font-size: 0.8rem;
+      }
+
+      .theme-toggle {
+        padding: 0.55rem 0.7rem;
       }
     }
 
