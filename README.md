@@ -27,8 +27,9 @@ A minimal, retro-arcade themed blog for computer science, AI and technology post
 | 3 | [qubit](https://cs-astronaut.github.io/Human-Readable/blog/qubit/) | 2026-07-04 | [@grep-FOX](https://github.com/grep-FOX) |
 | 4 | [dithering](https://cs-astronaut.github.io/Human-Readable/blog/dithering/) | 2026-07-14 | [@CS-Astronaut](https://github.com/CS-Astronaut) |
 | 5 | [ai-agents](https://cs-astronaut.github.io/Human-Readable/blog/ai-agents/) | 2026-07-26 | [@CS-Astronaut](https://github.com/CS-Astronaut) |
+| 6 | [dreaming-and-brain-overfitting](https://cs-astronaut.github.io/Human-Readable/blog/dreaming-and-brain-overfitting/) | 2026-08-06 | [@CS-Astronaut](https://github.com/CS-Astronaut) |
 
-##          Tech Stack
+##           Tech Stack
 
 - **Framework:** [Astro 6](https://astro.build)
 - **Styling:** CSS with Tokyo Night variables
