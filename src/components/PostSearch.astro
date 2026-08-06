@@ -230,7 +230,7 @@ const searchUrl = import.meta.env.BASE_URL + 'search.json';
     content: "";
     position: absolute;
     inset: 0;
-    background: rgba(26, 27, 38, 0.4);
+    background: var(--image-overlay);
     z-index: 1;
   }
 
@@ -285,7 +285,7 @@ const searchUrl = import.meta.env.BASE_URL + 'search.json';
 
   .search-results :global(.search-card-tag) {
     color: var(--color-accent-warm);
-    background-color: rgba(122, 162, 247, 0.1);
+    background-color: var(--accent-bg);
     padding: 0.2rem 0.6rem;
     border-radius: 2px;
     border: 1px solid var(--color-accent-warm);
