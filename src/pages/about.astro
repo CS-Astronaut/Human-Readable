@@ -71,6 +71,13 @@ const mobileBg = await getImage({
     saturate(0.65);
 }
 
+:global(:root[data-theme="light"]) .background {
+  filter:
+    brightness(0.55)
+    contrast(1.05)
+    saturate(0.7);
+}
+
 .background-overlay {
   position: fixed;
   inset: 0;
