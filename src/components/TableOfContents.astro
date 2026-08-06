@@ -435,6 +435,12 @@ for (const h of tocHeadings) {
   }
 
   @media (max-width: 1080px) {
+    /* On mobile/tablet the TOC sits at the top of the article, so the
+       header's back-to-top arrow is pointless; the floating FAB covers it */
+    .toc-top {
+      display: none;
+    }
+
     .toc-sidebar {
       position: static;
       max-height: none;
