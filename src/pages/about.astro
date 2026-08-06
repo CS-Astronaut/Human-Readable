@@ -81,9 +81,9 @@ const mobileBg = await getImage({
   background:
     radial-gradient(
       circle at center,
-      rgba(26, 27, 38, 0.08) 0%,
-      rgba(26, 27, 38, 0.45) 45%,
-      rgba(26, 27, 38, 0.92) 100%
+      var(--vignette-soft) 0%,
+      var(--vignette) 45%,
+      var(--vignette-strong) 100%
     );
 }
 
@@ -136,7 +136,7 @@ const mobileBg = await getImage({
   background:
     radial-gradient(
       circle,
-      rgba(122, 162, 247, 0.08),
+      var(--terminal-glow),
       transparent 70%
     );
 
@@ -194,8 +194,8 @@ const mobileBg = await getImage({
     background:
       radial-gradient(
         circle,
-        rgba(122, 162, 247, 0.05),
-        rgba(122, 162, 247, 0.02) 45%,
+        var(--terminal-glow-soft),
+        var(--terminal-glow-faint) 45%,
         transparent 70%
       );
     filter: none;

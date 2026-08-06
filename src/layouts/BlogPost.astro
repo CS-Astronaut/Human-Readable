@@ -182,7 +182,7 @@ const pubDate = new Date(frontmatter.pubDate).toLocaleDateString('en-US', {
     color: var(--color-accent);
     border-color: var(--color-primary);
     box-shadow: var(--glow-primary);
-    background-color: rgba(122, 162, 247, 0.05);
+    background-color: var(--tint-subtle);
   }
 
   .copy-icon {
@@ -209,7 +209,7 @@ const pubDate = new Date(frontmatter.pubDate).toLocaleDateString('en-US', {
     opacity: 0;
     transition: opacity 0.2s ease, transform 0.2s ease;
     white-space: nowrap;
-    box-shadow: 0 2px 8px rgba(158, 206, 106, 0.3);
+    box-shadow: 0 2px 8px var(--success-glow);
   }
 
   .copy-btn.copied .copy-feedback {

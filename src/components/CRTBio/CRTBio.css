@@ -2,9 +2,9 @@
 
     position:relative;
 
-    background:#16161e;
+    background:var(--color-bg);
 
-    border:1px solid #2f334d;
+    border:1px solid var(--color-surface-light);
 
     border-radius:10px;
 
@@ -14,8 +14,8 @@
     height: 420px;          /* Fixed monitor height */
 
     box-shadow:
-    0 0 10px rgba(122,162,247,.12),
-    inset 0 0 10px rgba(255,255,255,.02);
+    0 0 10px var(--glow-faint),
+    inset 0 0 10px var(--crt-inner-glow);
 }
 
 
@@ -37,7 +37,7 @@
 
         transparent 2px,
 
-        rgba(255,255,255,.025) 3px,
+        var(--scanline) 3px,
 
         transparent 4px
 
@@ -60,7 +60,7 @@
 
     radial-gradient(circle at center,
 
-    rgba(122,162,247,.05),
+    var(--terminal-glow-soft),
 
     transparent 70%);
 
@@ -89,13 +89,13 @@
     white-space: pre-wrap;
 
 
-    color: #c0caf5;
+    color: var(--color-text);
 
 
     scrollbar-width: none;
 
     text-shadow:
-    0 0 5px rgba(122,162,247,.35);
+    0 0 5px var(--text-glow);
     border-left: none;
 
     font-family: "JetBrains Mono", monospace;
@@ -118,7 +118,7 @@
 
     height:18px;
 
-    background:#7aa2f7;
+    background:var(--color-primary);
 
     vertical-align:middle;
 

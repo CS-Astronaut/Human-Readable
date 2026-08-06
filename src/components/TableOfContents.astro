@@ -286,7 +286,7 @@ for (const h of tocHeadings) {
     color: var(--color-primary);
     font-family: "Courier New", monospace;
     cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 2px 8px var(--shadow-weak);
     transition:
       color 0.2s ease,
       background 0.2s ease,
@@ -334,8 +334,8 @@ for (const h of tocHeadings) {
     visibility: hidden;
     transform: translateY(8px);
     box-shadow:
-      0 4px 16px rgba(0, 0, 0, 0.35),
-      0 0 8px rgba(122, 162, 247, 0.12);
+      0 4px 16px var(--shadow-strong),
+      0 0 8px var(--glow-faint);
     transition:
       opacity 0.25s ease,
       visibility 0.25s,
@@ -421,14 +421,14 @@ for (const h of tocHeadings) {
 
   .toc-link:hover {
     color: var(--color-primary);
-    background-color: rgba(122, 162, 247, 0.06);
+    background-color: var(--hover-bg);
     border-inline-start-color: var(--color-primary);
   }
 
   .toc-link.active {
     color: var(--color-primary);
     border-inline-start-color: var(--color-primary);
-    background-color: rgba(122, 162, 247, 0.1);
+    background-color: var(--accent-bg);
     text-shadow: var(--glow-primary);
   }
 
