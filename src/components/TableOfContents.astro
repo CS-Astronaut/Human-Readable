@@ -50,7 +50,11 @@ for (const h of tocHeadings) {
           <span class="toc-title">contents</span>
           <span class="toc-arrow" aria-hidden="true">▾</span>
         </button>
-        <button id="toc-top" class="toc-top" type="button" aria-label="back to top" title="back to top">↑</button>
+        <button id="toc-top" class="toc-top" type="button" aria-label="back to top" title="back to top">
+          <svg class="toc-top-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M18 15l-6-6-6 6"></path>
+          </svg>
+        </button>
       </div>
 
     <nav id="toc-nav" class="toc-nav" aria-label="Sections in this post">
@@ -79,7 +83,11 @@ for (const h of tocHeadings) {
 
     {/* Mobile: the TOC isn't sticky, so a floating go-up that appears
         once the reader scrolls past the top */}
-    <button id="toc-floating-top" class="toc-floating-top" type="button" aria-label="back to top" title="back to top">↑</button>
+    <button id="toc-floating-top" class="toc-floating-top" type="button" aria-label="back to top" title="back to top">
+      <svg class="toc-top-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M18 15l-6-6-6 6"></path>
+      </svg>
+    </button>
   </>
 )}
 
@@ -266,18 +274,45 @@ for (const h of tocHeadings) {
 
   .toc-top {
     flex-shrink: 0;
-    background: none;
-    border: none;
-    padding: 0.25rem 0.4rem;
-    color: var(--color-text-dim);
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    background: linear-gradient(180deg, var(--color-surface-light), var(--color-surface));
+    border: 1px solid var(--color-surface-light);
+    border-radius: 6px;
+    color: var(--color-primary);
     font-family: "Courier New", monospace;
-    font-size: 1rem;
     cursor: pointer;
-    transition: color 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    transition:
+      color 0.2s ease,
+      background 0.2s ease,
+      border-color 0.2s ease,
+      box-shadow 0.2s ease,
+      transform 0.2s ease;
   }
 
   .toc-top:hover {
     color: var(--color-accent);
+    border-color: var(--color-primary);
+    box-shadow: var(--glow-primary);
+    transform: translateY(-2px);
+  }
+
+  .toc-top:active {
+    transform: translateY(0) scale(0.94);
+  }
+
+  .toc-top:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  .toc-top .toc-top-icon {
+    display: block;
   }
 
   .toc-floating-top {
@@ -285,25 +320,26 @@ for (const h of tocHeadings) {
     bottom: 1.25rem;
     inset-inline-end: 1.25rem;
     z-index: 50;
-    min-width: 44px;
-    min-height: 44px;
+    min-width: 46px;
+    min-height: 46px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background-color: transparent;
+    background: linear-gradient(180deg, var(--color-surface-light), var(--color-surface));
     border: 1px solid var(--color-surface-light);
-    border-radius: 2px;
+    border-radius: 8px;
     color: var(--color-primary);
-    font-family: "Courier New", monospace;
-    font-size: 1.1rem;
     cursor: pointer;
     opacity: 0;
     visibility: hidden;
     transform: translateY(8px);
+    box-shadow:
+      0 4px 16px rgba(0, 0, 0, 0.35),
+      0 0 8px rgba(122, 162, 247, 0.12);
     transition:
       opacity 0.25s ease,
-      transform 0.25s ease,
       visibility 0.25s,
+      transform 0.25s ease,
       color 0.2s ease,
       border-color 0.2s ease,
       box-shadow 0.2s ease;
@@ -319,6 +355,20 @@ for (const h of tocHeadings) {
     color: var(--color-accent);
     border-color: var(--color-primary);
     box-shadow: var(--glow-primary);
+    transform: translateY(-3px);
+  }
+
+  .toc-floating-top:active {
+    transform: translateY(-1px) scale(0.96);
+  }
+
+  .toc-floating-top:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  .toc-floating-top .toc-top-icon {
+    display: block;
   }
 
   .toc-arrow {
