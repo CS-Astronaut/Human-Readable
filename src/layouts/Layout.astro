@@ -139,14 +139,10 @@ const { title, description, ogImage, lang = "en", dir = "ltr" } = Astro.props;
   <style>
 
     /* Layout.astro */
-    html, body {
-      height: 100%;
-    }
-
     body {
       display: flex;
       flex-direction: column;
-      min-height: 100vh;
+      min-height: 100dvh;
     }
 
     main {
@@ -162,16 +158,24 @@ const { title, description, ogImage, lang = "en", dir = "ltr" } = Astro.props;
       position: sticky;
       top: 0;
       z-index: 100;
-      background: linear-gradient(
-        180deg,
-        rgba(26, 27, 38, 0.95) 0%,
-        rgba(26, 27, 38, 0.85) 100%
-      );
-      backdrop-filter: blur(10px);
+      background: var(--color-surface);
       border-bottom: 1px solid rgba(122, 162, 247, 0.1);
       padding: 1.2rem 0;
       margin-bottom: 3rem;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Frosted-glass blur is GPU-heavy while scrolling on touch devices:
+       keep it desktop-only, use a solid header on mobile */
+    @media (hover: hover) and (pointer: fine) {
+      .site-header {
+        background: linear-gradient(
+          180deg,
+          rgba(26, 27, 38, 0.95) 0%,
+          rgba(26, 27, 38, 0.85) 100%
+        );
+        backdrop-filter: blur(10px);
+      }
     }
 
     .container {
