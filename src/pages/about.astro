@@ -1,30 +1,37 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import { Image } from "astro:assets";
+import { getImage } from "astro:assets";
 import CRTBio from "../components/CRTBio/CRTBio.astro";
 
-const images = import.meta.glob<{ default: ImageMetadata }>(
-  "../assets/slideshow/*.{jpg,jpeg,png,webp}",
-  { eager: true }
-);
+import desktopImage from "../assets/slideshow/desktop.webp";
+import mobileImage from "../assets/slideshow/mobile.webp";
 
-const slideImages = Object.values(images)
-  .map((m) => m.default)
-  .sort();
-
-const randomImage =
-  slideImages[Math.floor(Math.random() * slideImages.length)];
+const desktopBg = await getImage({
+  src: desktopImage,
+  format: "webp",
+  densities: [1, 2],
+});
+const mobileBg = await getImage({
+  src: mobileImage,
+  format: "webp",
+  densities: [1, 2],
+});
 ---
 
 <Layout title="about">
 
-    <Image
-        src={randomImage}
+    <picture>
+      <source media="(max-width: 640px)" srcset={mobileBg.src} />
+      <source srcset={desktopBg.src} />
+      <img
+        src={desktopBg.src}
         alt=""
         loading="eager"
         fetchpriority="high"
+        decoding="async"
         class="background"
-    />
+      />
+    </picture>
 
     <div class="background-overlay"></div>
     <section class="about">
@@ -34,7 +41,6 @@ const randomImage =
     </section>
 
 </Layout>
-
 
 <style>
 :root {
@@ -91,15 +97,11 @@ const randomImage =
 
   display: flex;
   flex-direction: column;
-
-  /* FIX 1: Shorthand 'overflow: hidden' clips the ambient glow on both axes, 
-            preventing the browser from forcing 'overflow-y: auto' */
   overflow: hidden;
 
-  /* FIX 2: 'flex: 1' fills available space without strictly forcing 100% height 
-            before padding is calculated. We also add a safe fallback. */
-  flex: 1;
-  min-height: 100%;
+  /* main is flex:1 of the 100dvh body, so this section fills exactly
+     the space between the site header and the footer */
+  height: 100%;
   box-sizing: border-box;
 
   padding:
@@ -123,7 +125,6 @@ const randomImage =
 }
 
 /* Ambient glow */
-
 .terminal-container::before {
   content: "";
 
@@ -176,8 +177,6 @@ const randomImage =
 @media (max-width: 640px) {
 
   .background {
-    /* filter on a fixed full-screen image forces re-rasterization on every
-       scroll frame on mobile; drop it on touch-sized screens */
     filter: none;
     transform: scale(1.12);
     object-position: center top;
@@ -192,8 +191,6 @@ const randomImage =
 
   .terminal-container::before {
     inset: -40px;
-    /* blur() on a large layer is expensive on mobile; use a soft
-       pre-faded gradient instead */
     background:
       radial-gradient(
         circle,
@@ -210,9 +207,6 @@ const randomImage =
    ONE-VIEWPORT FIT
 ========================================== */
 
-/* Give the fixed-height CRT monitor (min 480px) room to fit in a single
-   viewport: strip the site chrome margins on this page only. These
-   styles ship only with the about page. */
 :global(.site-header) {
   margin-bottom: 0 !important;
 }
