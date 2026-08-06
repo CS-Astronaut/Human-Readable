@@ -107,8 +107,9 @@ const searchUrl = import.meta.env.BASE_URL + 'search.json';
         if (list) list.hidden = true;
         if (pager) pager.hidden = true;
         results.hidden = false;
-        results.innerHTML = hits.length
-          ? hits.map(cardHtml).join('')
+        const shown = hits.slice(0, 5);
+        results.innerHTML = shown.length
+          ? shown.map(cardHtml).join('')
           : `<p class="search-none">no results for "${escapeHtml(q)}"</p>`;
       });
     }
