@@ -1,26 +1,20 @@
 ---
-import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
+import PostList from '../components/PostList.astro';
 import PostCard from '../components/PostCard.astro';
-import { Image } from "astro:assets";
+import { getAllPosts, getPostsPage, getTotalPages } from '../lib/posts';
 import '../styles/theme.css';
 
-// Fetch all blog posts
-const allPosts = await getCollection('blog');
-
 // Sort by date (newest first)
-const sortedPosts = allPosts.sort(
-  (a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()
-);
+const sortedPosts = await getAllPosts();
 
 // Find featured post, fallback to first post
 const featuredPost = sortedPosts.find((post) => post.data.featured) || sortedPosts[0];
 
-// Get recent posts (exclude featured, limit to 10)
-const recentPosts = sortedPosts.filter((post) => post.id !== featuredPost.id).slice(0, 10);
-
-// Helper to get slug from post ID
-const getSlug = (post: any) => post.id.split('/').pop()?.replace(/\.md$/, '') || '';
+// Listing = everything except the featured post, newest first
+const listing = sortedPosts.filter((post) => post.id !== featuredPost.id);
+const totalPages = getTotalPages(listing.length);
+const pagePosts = getPostsPage(listing, 1);
 ---
 
 <Layout title="home">
@@ -35,104 +29,16 @@ const getSlug = (post: any) => post.id.split('/').pop()?.replace(/\.md$/, '') ||
     </section>
 
 {featuredPost && (
-  <section class="featured-section">
-    <p class="section-label">featured post</p>
-
-    <article class="post-card featured">
-      <div class="card-content">
-        <h3 class="card-title">
-          <a href={`${import.meta.env.BASE_URL}blog/${getSlug(featuredPost)}`}>
-            {featuredPost.data.title}
-          </a>
-        </h3>
-
-        <p class="card-description">
-          {featuredPost.data.description}
-        </p>
-
-        <div class="card-footer">
-          <span class="card-date">
-            {new Date(featuredPost.data.pubDate).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric',
-            })}
-          </span>
-
-          {featuredPost.data.tags && featuredPost.data.tags.length > 0 && (
-            <div class="card-tags">
-              {featuredPost.data.tags.map((tag: string) => (
-                <span class="card-tag">#{tag}</span>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {featuredPost.data.cover && (
-        <Image
-          src={featuredPost.data.cover}
-          alt=""
-          class="card-bg"
-          widths={[400, 800]}
-          format="webp"
-          loading="eager"
-         />
-      )}
-    </article>
-  </section>
+    <section class="featured-section">
+      <p class="section-label">featured post</p>
+      <PostCard post={featuredPost} featured />
+    </section>
 )}
 
 
     <!-- Recent Posts -->
-    {recentPosts.length > 0 && (
-      <section class="posts-section" id="posts">
-        <p class="section-label">recent posts</p>
-        <div class="posts-list">
-              {recentPosts.map((post) => (
-              <article class="post-card">
-              {post.data.cover && (
-                  <Image
-                    src={post.data.cover}
-                    alt=""
-                    class="card-bg"
-                    widths={[400, 800]}
-                    format="webp"
-                    loading="lazy"
-                    decoding="async"
-                  />
-
-                )}
-
-
-              <div class="card-content">
-                <h3 class="card-title">
-                  <a href={`${import.meta.env.BASE_URL}blog/${getSlug(post)}`}>
-                    {post.data.title}
-                  </a>
-                </h3>
-                <p class="card-description">{post.data.description}</p>
-                <div class="card-footer">
-                  <span class="card-date">
-                    {new Date(post.data.pubDate).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric',
-                    })}
-                  </span>
-                  {post.data.tags && post.data.tags.length > 0 && (
-                    <div class="card-tags">
-                      {post.data.tags.map((tag: string) => (
-                        <span class="card-tag">#{tag}</span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
+    {pagePosts.length > 0 && (
+      <PostList posts={pagePosts} currentPage={1} totalPages={totalPages} baseHref={import.meta.env.BASE_URL} />
     )}
 
     <!-- Empty State -->
@@ -198,139 +104,8 @@ const getSlug = (post: any) => post.id.split('/').pop()?.replace(/\.md$/, '') ||
     margin-bottom: 2rem;
   }
 
-  .posts-list {
-    display: flex;
-    align-content:flex-start;
-    flex-direction: column;
-  }
-
   .empty-state {
     text-align: center;
     padding: 4rem 0;
   }
-
- .post-card {
-  position: relative;
-  padding: 1.5rem;
-  border: 1px solid var(--color-surface-light);
-  border-radius: 2px;
-  background-color: var(--color-surface);
-  transition: all 0.25s ease;
-  margin-bottom: 1.5rem;
-
-  overflow: hidden; /* important for image clipping */
-}
-
-.card-bg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-
-  object-fit: cover;
-
-  /* makes it subtle + moody */
-  opacity: 0.25;
-  filter: blur(2px) brightness(0.7) saturate(1.2);
-
-  transform: scale(1.1); /* avoids blur edges showing */
-  z-index: 0;
-}
-
-.post-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(26, 27, 38, 0.4);
-  z-index: 1;
-}
-.card-content {
-  position: relative;
-  z-index: 2;
-}
-
-  .post-card:hover {
-    border-color: var(--color-primary);
-    box-shadow: var(--glow-primary);
-  }
-
-  .post-card.featured {
-    border: 2px solid var(--color-accent);
-    background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-surface-light) 100%);
-    padding: 2rem;
-    margin-bottom: 3rem;
-  }
-
-  .post-card.featured .card-title {
-    color: var(--color-accent);
-    text-shadow: var(--glow-accent);
-  }
-
-  .card-title {
-    margin-bottom: 0.75rem;
-    margin-top: 0;
-  }
-
-  .card-title a {
-    color: var(--color-primary);
-    border: none;
-    transition: color 0.2s ease;
-  }
-
-  .card-title a:hover {
-    color: var(--color-accent);
-  }
-
-  .featured .card-title a {
-    color: var(--color-accent);
-  }
-
-  .card-description {
-    color: var(--color-text-dim);
-    margin-bottom: 1rem;
-    font-size: 0.95rem;
-  }
-
-  .card-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-    flex-wrap: wrap;
-    font-size: 0.85rem;
-  }
-
-  .card-date {
-    color: var(--color-text-dim);
-  }
-
-  .card-tags {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-  }
-
-  .card-tag {
-    color: var(--color-accent-warm);
-    background-color: rgba(122, 162, 247, 0.1);
-    padding: 0.2rem 0.6rem;
-    border-radius: 2px;
-    border: 1px solid var(--color-accent-warm);
-  }
-
-  @media (max-width: 640px) {
-    .post-card {
-      padding: 1rem;
-    }
-
-    .post-card.featured {
-      padding: 1.5rem;
-    }
-
-    .card-footer {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-  }
-
 </style>

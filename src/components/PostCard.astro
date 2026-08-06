@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import { Image } from 'astro:assets';
 
 interface Props {
   post: CollectionEntry<'blog'>;
@@ -18,6 +19,17 @@ const pubDateFormatted = new Date(pubDate).toLocaleDateString('en-US', {
 ---
 
 <article class={`post-card ${featured ? 'featured' : ''}`}>
+  {post.data.cover && (
+    <Image
+      src={post.data.cover}
+      alt=""
+      class="card-bg"
+      widths={[400, 800]}
+      format="webp"
+      loading={featured ? 'eager' : 'lazy'}
+      decoding="async"
+    />
+  )}
   <div class="card-content">
     <h3 class="card-title">
       <a href={`${import.meta.env.BASE_URL}blog/${slug}`}>{title}</a>
@@ -38,12 +50,42 @@ const pubDateFormatted = new Date(pubDate).toLocaleDateString('en-US', {
 
 <style>
   .post-card {
+    position: relative;
     padding: 1.5rem;
     border: 1px solid var(--color-surface-light);
     border-radius: 2px;
     background-color: var(--color-surface);
     transition: all 0.25s ease;
     margin-bottom: 1.5rem;
+    overflow: hidden; /* important for image clipping */
+  }
+
+  .card-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+
+    /* makes it subtle + moody */
+    opacity: 0.25;
+    filter: blur(2px) brightness(0.7) saturate(1.2);
+
+    transform: scale(1.1); /* avoids blur edges showing */
+    z-index: 0;
+  }
+
+  .post-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(26, 27, 38, 0.4);
+    z-index: 1;
+  }
+
+  .card-content {
+    position: relative;
+    z-index: 2;
   }
 
   .post-card:hover {
